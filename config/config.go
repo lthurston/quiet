@@ -4,6 +4,7 @@ import (
 	"github.com/stvp/go-toml-config"
 	"os/user"
 	"fmt"
+	"io/ioutil"
 )
 
 var (
@@ -11,16 +12,26 @@ var (
 )
 
 func Parse() {
+    quietConfig := getHomeDir() + "/.quiet"
+	if err := config.Parse(quietConfig); err != nil {
+		create(quietConfig)
+		fmt.Println("Config file created at " + quietConfig + " with __ALL__ my favorite defaults!")
+	}
+}
+
+func getHomeDir() string {
 	usr, err := user.Current()
     if err != nil {
         panic(err)
     }
 
-	if err := config.Parse(usr.HomeDir + "/.quiet"); err != nil {
-		create()
-	}
+	return usr.HomeDir 
 }
 
-func create() {
-	fmt.Println("Let's make that config file")
+func create(file string) {
+	configBytes := []byte(`file = ` + *File)
+	err := ioutil.WriteFile(file, configBytes, 0644)
+	if err != nil {
+		panic(err)
+	}
 }
