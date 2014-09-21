@@ -8,26 +8,52 @@ import (
 	"github.com/stvp/go-toml-config"
 )
 
-var sshFile = config.String("file", "~/.ssh/config")
-var strategy = config.String("strategy", "append")
+var configFile = config.String("file", "~/.ssh/config")
 
-// Parse reads the config, or creates one with defaults
-func Parse(quietConfig string) {
-	if quietConfig == "" {
-		quietConfig = getHomeDir() + "/.quiet"
-	}
-
-	if Parseable(quietConfig) {
-		create(quietConfig)
-		fmt.Println("Config file created at " + quietConfig + " with __ALL__ my favorite defaults!")
-	}
-}
+// quietConfig stores the location of the quiet config, defaults to "~/.quiet"
+var quietConfig = ""
 
 // Parseable tells us if the config file can be read / parsed
 func Parseable(quietConfig string) bool {
 	return config.Parse(quietConfig) != nil
 }
 
+// GetConfigFile returns a config value
+func GetConfigFile() string {
+	return *configFile
+}
+
+// GetConfigMap returns a map of all configuration values
+func GetConfigMap() map[string]string {
+	configMap := make(map[string]string)
+	configMap["file"] = *configFile
+	return configMap
+}
+
+// SetQuietConfig sets the location of the quiet config file
+func SetQuietConfig(qc string) {
+	quietConfig = qc
+	parse()
+}
+
+func init() {
+	parse()
+}
+
+// parse reads the config, or creates one with defaults; an alternate file location
+// for .quiet can be passed in, but this is likely not all that useful
+func parse() {
+	if quietConfig == "" {
+		quietConfig = getHomeDir() + "/.quiet"
+	}
+
+	if !Parseable(quietConfig) {
+		create(quietConfig)
+		fmt.Println("Config file created at " + quietConfig + " with __ALL__ my favorite defaults!")
+	}
+}
+
+// getHomeDir returns the user's home directory -- this belongs elsewhere
 func getHomeDir() string {
 	usr, err := user.Current()
 	if err != nil {
@@ -37,11 +63,9 @@ func getHomeDir() string {
 	return usr.HomeDir
 }
 
+// create will write a configuration file
 func create(file string) {
-	configBytes := []byte(
-		`file = ` + *sshFile +
-			`strategy = ` + *strategy,
-	)
+	configBytes := getQuietConfigBytes()
 
 	err := ioutil.WriteFile(file, configBytes, 0644)
 	if err != nil {
@@ -49,12 +73,11 @@ func create(file string) {
 	}
 }
 
-// GetSSHFile returns a config value
-func GetSSHFile() string {
-	return *sshFile
-}
-
-// GetStrategy returns a config value
-func GetStrategy() string {
-	return *strategy
+// getQuietConfigBytes returns a bytestring of the config values -- probably
+// should use the GetConfigMap
+func getQuietConfigBytes() (bytes []byte) {
+	bytes = []byte(
+		`file = ` + *configFile,
+	)
+	return
 }
