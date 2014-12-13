@@ -23,4 +23,5 @@ func addCommands() {
 	QuietCmd.AddCommand(versionCmd)
 	QuietCmd.AddCommand(configCmd)
 	QuietCmd.AddCommand(dumpCmd)
+	QuietCmd.AddCommand(listCmd)
 }

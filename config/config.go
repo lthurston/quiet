@@ -5,17 +5,17 @@ import (
 	"io/ioutil"
 	"os/user"
 
-	"github.com/stvp/go-toml-config"
+	goTomlConfig "github.com/stvp/go-toml-config"
 )
 
-var configFile = config.String("file", "~/.ssh/config")
+var configFile = goTomlConfig.String("file", getHomeDir()+"/.ssh/config")
 
 // quietConfig stores the location of the quiet config, defaults to "~/.quiet"
 var quietConfig = ""
 
 // Parseable tells us if the config file can be read / parsed
 func Parseable(quietConfig string) bool {
-	return config.Parse(quietConfig) != nil
+	return goTomlConfig.Parse(quietConfig) != nil
 }
 
 // GetConfigFile returns a config value

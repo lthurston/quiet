@@ -8,15 +8,15 @@ import (
 )
 
 type host struct {
-	name      string
-	config    map[string]string
+	Name      string
+	Config    map[string]string
 	StartLine int
 	EndLine   int
 }
 
 func makeHost() host {
 	i := host{}
-	i.config = make(map[string]string)
+	i.Config = make(map[string]string)
 	return i
 }
 
@@ -24,7 +24,7 @@ func (host *host) addConfigFromString(line string) {
 	line = strings.TrimSpace(line)
 	sepIndex := strings.IndexAny(line, " \t")
 	config, value := line[0:sepIndex], line[sepIndex+1:]
-	host.config[config] = value
+	host.Config[config] = value
 }
 
 // HostsCollection is a collection of hosts from the config file!
@@ -84,9 +84,8 @@ func getLineMatcher(regexStrings []string) lineMatcher {
 }
 
 func getHostName(line string) string {
-	line = line + "line "
-	hostname := "feces test"
-	return hostname
+	fields := strings.Fields(line)
+	return fields[1]
 }
 
 // fromScanner populates the host from a bufio.Scanner
@@ -116,7 +115,7 @@ func (hosts *HostsCollection) fromScanner(s *bufio.Scanner) {
 				}
 				foundFirstHostLine = true
 				host.StartLine = lineIndex
-				host.name = getHostName(line)
+				host.Name = getHostName(line)
 			} else {
 				if foundFirstHostLine {
 					host.addConfigFromString(line)
