@@ -114,6 +114,7 @@ func (hosts *HostsCollection) fromScanner(s *bufio.Scanner) {
 					hosts.Hosts = append(hosts.Hosts, host)
 				}
 				foundFirstHostLine = true
+				host = makeHost()
 				host.StartLine = lineIndex
 				host.Name = getHostName(line)
 			} else {

@@ -8,7 +8,10 @@ import (
 	goTomlConfig "github.com/stvp/go-toml-config"
 )
 
-var configFile = goTomlConfig.String("file", getHomeDir()+"/.ssh/config")
+var (
+	configFile       = goTomlConfig.String("file", getHomeDir()+"/.ssh/config")
+	configListFields = goTomlConfig.String("list.fields", "User, Hostname")
+)
 
 // quietConfig stores the location of the quiet config, defaults to "~/.quiet"
 var quietConfig = ""
@@ -18,9 +21,14 @@ func Parseable(quietConfig string) bool {
 	return goTomlConfig.Parse(quietConfig) != nil
 }
 
-// GetConfigFile returns a config value
+// GetConfigFile returns `file`
 func GetConfigFile() string {
 	return *configFile
+}
+
+// GetConfigListFields returns `list.show`
+func GetConfigListFields() string {
+	return *configListFields
 }
 
 // GetConfigMap returns a map of all configuration values

@@ -13,5 +13,6 @@ var configCmd = &cobra.Command{
 	Long:  `Shows all configuration values if no arguments are provided, otherwise modifies with argument key/value pairs`,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("file: " + config.GetConfigFile())
+		fmt.Println("list.fields: " + config.GetConfigListFields())
 	},
 }
