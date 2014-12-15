@@ -14,7 +14,7 @@ func SpliceInto(lineStart, lineEnd int, spliceContent string, readSeeker io.Read
 	scanner := bufio.NewScanner(readSeeker)
 
 	if lineStart > 0 {
-		firstPart := GetLines(0, lineStart, scanner)
+		firstPart := getLines(0, lineStart, scanner)
 		if len(firstPart) > 0 {
 			parts = append(parts, firstPart)
 		}
@@ -25,9 +25,10 @@ func SpliceInto(lineStart, lineEnd int, spliceContent string, readSeeker io.Read
 	}
 
 	if lineEnd > 0 {
+		// Reset the reader so we can read again
 		readSeeker.Seek(0, 0)
 		scanner = bufio.NewScanner(readSeeker)
-		lastPart := GetLines(lineEnd, 0, scanner)
+		lastPart := getLines(lineEnd, 0, scanner)
 		if len(lastPart) > 0 {
 			parts = append(parts, lastPart)
 		}
@@ -39,10 +40,11 @@ func SpliceInto(lineStart, lineEnd int, spliceContent string, readSeeker io.Read
 }
 
 // GetLines gets a section of lines from lineStart to lineEnd
-func GetLines(lineStart, lineEnd int, scanner *bufio.Scanner) string {
+func getLines(lineStart, lineEnd int, scanner *bufio.Scanner) string {
 	var lines []string
 	lineIndex := 0
 
+	// Skip the junk
 	if lineStart > 0 {
 		for scanner.Scan() {
 			if lineStart == lineIndex {
@@ -51,6 +53,8 @@ func GetLines(lineStart, lineEnd int, scanner *bufio.Scanner) string {
 			lineIndex++
 		}
 	}
+
+	// Grab the goods
 	for scanner.Scan() {
 		if lineEnd == lineIndex {
 			break
