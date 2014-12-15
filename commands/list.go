@@ -18,7 +18,7 @@ var listCmd = &cobra.Command{
 		hosts.ReadFromFile(config.GetConfigFile())
 		for _, host := range hosts.Hosts {
 			configFields := formatHostConfigFields(config.GetConfigListFields(), host.Config)
-			fmt.Printf("%-20s %s", host.Name, configFields)
+			fmt.Printf(config.GetConfigListFormat(), host.Name, configFields)
 			fmt.Println("")
 		}
 	},
@@ -29,7 +29,8 @@ func formatHostConfigFields(fieldsString string, configs map[string]string) stri
 	fields := strings.Split(fieldsString, ",")
 	for key, value := range configs {
 		for _, field := range fields {
-			if key == strings.TrimSpace(field) {
+			field = strings.TrimSpace(field)
+			if key == field {
 				out = out + field + ": " + value + "  "
 			}
 		}
