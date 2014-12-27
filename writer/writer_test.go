@@ -2,7 +2,6 @@ package writer_test
 
 import (
 	"bytes"
-	"fmt"
 	"strings"
 	"testing"
 
@@ -24,22 +23,6 @@ var spliceContent = `I've
 Been
 Spliced
 In`
-
-// func TestGetLines(*testing.T) {
-// 	r := strings.NewReader(contents)
-// 	scanner := bufio.NewScanner(r)
-// 	fmt.Println("TEST 1")
-// 	fmt.Println(writer.GetLines(0, 4, scanner))
-// 	r = strings.NewReader(contents)
-// 	scanner = bufio.NewScanner(r)
-// 	fmt.Println("TEST 2")
-// 	fmt.Println(writer.GetLines(4, 0, scanner))
-//
-// 	r = strings.NewReader(contents)
-// 	scanner = bufio.NewScanner(r)
-// 	fmt.Println("TEST 3")
-// 	fmt.Println(writer.GetLines(3, 7, scanner))
-// }
 
 func TestSpliceIntoMiddle(t *testing.T) {
 	reader := strings.NewReader(contents)
@@ -96,8 +79,6 @@ Been
 Spliced
 In`
 	if expectedResult != splice {
-		fmt.Println("END")
-		fmt.Println(splice)
 		t.Error("Unexpected splice results")
 	}
 }

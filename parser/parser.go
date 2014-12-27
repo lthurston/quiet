@@ -9,6 +9,7 @@ import (
 
 type host struct {
 	Name      string
+	Aliases   []string
 	Config    map[string]string
 	StartLine int
 	EndLine   int
@@ -83,9 +84,8 @@ func getLineMatcher(regexStrings []string) lineMatcher {
 	}
 }
 
-func getHostName(line string) string {
-	fields := strings.Fields(line)
-	return fields[1]
+func getHostNames(line string) []string {
+	return strings.Fields(line)[1:]
 }
 
 // fromScanner populates the host from a bufio.Scanner
@@ -99,7 +99,6 @@ func (hosts *HostsCollection) fromScanner(s *bufio.Scanner) {
 	foundFirstHostLine := false
 
 	// Remove garbage, only start tracking when we hit a "Host" line
-
 	lastNonSkippableLine := 0
 	lineIndex := 0
 
@@ -116,7 +115,9 @@ func (hosts *HostsCollection) fromScanner(s *bufio.Scanner) {
 				foundFirstHostLine = true
 				host = makeHost()
 				host.StartLine = lineIndex
-				host.Name = getHostName(line)
+				hostNames := getHostNames(line)
+				host.Name = hostNames[0]
+				host.Aliases = hostNames[1:]
 			} else {
 				if foundFirstHostLine {
 					host.addConfigFromString(line)
@@ -130,4 +131,14 @@ func (hosts *HostsCollection) fromScanner(s *bufio.Scanner) {
 		host.EndLine = lastNonSkippableLine
 		hosts.Hosts = append(hosts.Hosts, host)
 	}
+}
+
+// FindHostByName finds a host by name (not by host aliases!)
+func (hosts HostsCollection) FindHostByName(name string) (host, bool) {
+	for _, host := range hosts.Hosts {
+		if host.Name == name {
+			return host, true
+		}
+	}
+	return makeHost(), false
 }

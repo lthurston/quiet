@@ -11,6 +11,7 @@ import (
 var (
 	configFile       = goTomlConfig.String("file", getHomeDir()+"/.ssh/config")
 	configListFields = goTomlConfig.String("list.fields", "User, Hostname")
+	configNewFrom    = goTomlConfig.String("new.from", "")
 )
 
 // quietConfig stores the location of the quiet config, defaults to "~/.quiet"
@@ -29,6 +30,11 @@ func GetConfigFile() string {
 // GetConfigListFields returns `list.show`
 func GetConfigListFields() string {
 	return *configListFields
+}
+
+// GetConfigNewFrom returns `new.from`
+func GetConfigNewFrom() string {
+	return *configNewFrom
 }
 
 // GetConfigMap returns a map of all configuration values

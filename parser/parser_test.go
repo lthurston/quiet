@@ -57,7 +57,7 @@ func TestParse2(t *testing.T) {
 	hosts.ReadFromString(
 		`
 Host *
-    IdentitiesOnly yes
+	IdentitiesOnly yes
 
 # That one shouldn't become a host
 # because it is "*"
@@ -68,14 +68,14 @@ Host *
 #################################################
 
 Host ormulex-dev
-        Hostname dev.ormulex.com
-        User mule
-        IdentityFile ~/.ssh/ormulex/id_rsa
+			Hostname dev.ormulex.com
+			User mule
+			IdentityFile ~/.ssh/ormulex/id_rsa
 
 Host ormulex-qa
-        Hostname cmw3wbq10
-        User monkey
-        ProxyCommand ssh cmw3wbq10 'nc %h %banana %p'
+			Hostname cmw3wbq10
+			User monkey
+			ProxyCommand ssh cmw3wbq10 'nc %h %banana %p'
 
 
 # A comment with some empty lines around it
@@ -98,7 +98,50 @@ Host ormulex-qa
 	}
 }
 
-func TestFindHost(t *testing.T) {
+func TestFindHostByName(t *testing.T) {
+	hosts := parser.HostsCollection{}
+	hosts.ReadFromString(
+		`
+Host *
+		IdentitiesOnly yes
+
+# That one shouldn't become a host
+# because it is "*"
+
+
+#################################################
+# Ormulex - id_rsa ps is Billy's usual
+#################################################
+
+Host ormulex-dev
+				Hostname dev.ormulex.com
+				User mule
+				IdentityFile ~/.ssh/ormulex/id_rsa
+
+Host ormulex-qa
+				Hostname cmw3wbq10
+				User monkey
+				ProxyCommand ssh cmw3wbq10 'nc %h %banana %p'
+
+
+# A comment with some empty lines around it
+
+`)
+
+	host, found := hosts.FindHostByName("ormulex-dev")
+	if !found {
+		t.Errorf("Couldn't find the host using hosts.FindHostByName! (#1)")
+	}
+	if found && host.Name != "ormulex-dev" {
+		t.Errorf("hosts.FindHostByName found the wrong host (#2)")
+	}
+	host, found = hosts.FindHostByName("ormulex-qa")
+	if !found {
+		t.Errorf("Couldn't find the host using hosts.FindHostByName! (#3)")
+	}
+	if found && host.Name != "ormulex-qa" {
+		t.Errorf("hosts.FindHostByName found the wrong host (#4)")
+	}
 
 }
 
