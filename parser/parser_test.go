@@ -1,6 +1,7 @@
 package parser_test
 
 import (
+	"reflect"
 	"testing"
 
 	"github.com/lthurston/quiet/parser"
@@ -151,4 +152,33 @@ func TestFindHostValue(t *testing.T) {
 
 func TestWriteNewHost(t *testing.T) {
 
+}
+
+func TestRenderSnippet(t *testing.T) {
+	name := "skeins"
+	aliases := []string{"sizzle", "toast", "blort"}
+	config := map[string]string{"User": "gushaguy", "HostName": "skeins.com"}
+
+	host := parser.MakeHost()
+	host.Name = name
+	host.Aliases = aliases
+	host.Config = config
+	host.EndLine, host.StartLine = 0, 0
+
+	rendered := host.RenderSnippet()
+
+	hosts := parser.HostsCollection{}
+	hosts.ReadFromString(rendered)
+
+	if hosts.Hosts[0].Name != "skeins" {
+		t.Errorf("Wrong host name, expecting: %s got: %s", name, hosts.Hosts[0].Name)
+	}
+
+	if !reflect.DeepEqual(hosts.Hosts[0].Aliases, aliases) {
+		t.Errorf("Wrong aliases, expecting: %s got: %s", aliases, hosts.Hosts[0].Aliases)
+	}
+
+	if !reflect.DeepEqual(hosts.Hosts[0].Config, config) {
+		t.Errorf("Wrong config, expecting: %s got: %s", config, hosts.Hosts[0].Config)
+	}
 }

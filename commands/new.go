@@ -25,5 +25,11 @@ var newCmd = &cobra.Command{
 
 		hosts := parser.HostsCollection{}
 		hosts.ReadFromFile(config.GetConfigFile())
+		if host, found := hosts.FindHostByName(from); found {
+			newHostSnippet := host.RenderSnippet()
+			fmt.Println(newHostSnippet)
+		} else {
+			fmt.Println("Couldn't find host or empty: \"" + from + "\"")
+		}
 	},
 }

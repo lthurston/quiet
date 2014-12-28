@@ -2,9 +2,11 @@ package parser
 
 import (
 	"bufio"
+	"bytes"
 	"os"
 	"regexp"
 	"strings"
+	textTemplate "text/template"
 )
 
 type host struct {
@@ -15,7 +17,8 @@ type host struct {
 	EndLine   int
 }
 
-func makeHost() host {
+// MakeHost returns a host!
+func MakeHost() host {
 	i := host{}
 	i.Config = make(map[string]string)
 	return i
@@ -102,7 +105,7 @@ func (hosts *HostsCollection) fromScanner(s *bufio.Scanner) {
 	lastNonSkippableLine := 0
 	lineIndex := 0
 
-	host := makeHost()
+	host := MakeHost()
 	for s.Scan() {
 		lineIndex++
 		line := s.Text()
@@ -113,7 +116,7 @@ func (hosts *HostsCollection) fromScanner(s *bufio.Scanner) {
 					hosts.Hosts = append(hosts.Hosts, host)
 				}
 				foundFirstHostLine = true
-				host = makeHost()
+				host = MakeHost()
 				host.StartLine = lineIndex
 				hostNames := getHostNames(line)
 				host.Name = hostNames[0]
@@ -140,5 +143,25 @@ func (hosts HostsCollection) FindHostByName(name string) (host, bool) {
 			return host, true
 		}
 	}
-	return makeHost(), false
+	return MakeHost(), false
+}
+
+// RenderSnippet renders a host snippet
+func (host host) RenderSnippet() string {
+	tmpl, err := textTemplate.New("snip").Parse(`
+Host {{.Name}}{{if .Aliases}}{{range .Aliases}} {{.}}{{end}}{{end}}	
+	{{range $key, $value := .Config	 }}{{$key}} {{$value}}
+	{{end}}
+		`)
+	if err != nil {
+		panic(err)
+	}
+	buf := new(bytes.Buffer)
+
+	err = tmpl.Execute(buf, host)
+	if err != nil {
+		panic(err)
+	}
+
+	return buf.String()
 }
