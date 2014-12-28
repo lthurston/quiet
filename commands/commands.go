@@ -27,5 +27,7 @@ func addCommands() {
 
 	// find a better spot to put the flags
 	newCmd.Flags().StringVarP(&newFrom, "from", "f", "", "host to use as template")
+	newCmd.Flags().StringVarP(&newName, "name", "n", "", "new host name")
+	newCmd.Flags().BoolVarP(&newSkipInteractive, "skip-interactive", "s", false, "just copy; don't allow interactive")
 	QuietCmd.AddCommand(newCmd)
 }
