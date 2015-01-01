@@ -24,6 +24,7 @@ func addCommands() {
 	QuietCmd.AddCommand(configCmd)
 	QuietCmd.AddCommand(dumpCmd)
 	QuietCmd.AddCommand(listCmd)
+	QuietCmd.AddCommand(exportCmd)
 
 	// find a better spot to put the flags
 	newCmd.Flags().StringVarP(&newFrom, "from", "f", "", "host to use as template")
