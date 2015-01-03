@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"io/ioutil"
+	"os"
 	"os/user"
 
 	goTomlConfig "github.com/stvp/go-toml-config"
@@ -19,7 +20,7 @@ var quietConfig = ""
 
 // Parseable tells us if the config file can be read / parsed
 func Parseable(quietConfig string) bool {
-	return goTomlConfig.Parse(quietConfig) != nil
+	return goTomlConfig.Parse(quietConfig) == nil
 }
 
 // GetConfigFile returns `file`
@@ -61,9 +62,17 @@ func parse() {
 		quietConfig = getHomeDir() + "/.quiet"
 	}
 
+	if _, err := os.Stat(quietConfig); err != nil {
+		if os.IsNotExist(err) {
+			create(quietConfig)
+			fmt.Println("Config file created at " + quietConfig + " with __ALL__ my favorite defaults!")
+			return
+		}
+	}
+
 	if !Parseable(quietConfig) {
-		create(quietConfig)
-		fmt.Println("Config file created at " + quietConfig + " with __ALL__ my favorite defaults!")
+		fmt.Println("Your .quiet configuration exists, but it's not parsable. :(")
+		os.Exit(1)
 	}
 }
 
@@ -91,7 +100,13 @@ func create(file string) {
 // should use the GetConfigMap
 func getQuietConfigBytes() (bytes []byte) {
 	bytes = []byte(
-		`file = ` + *configFile,
+		`file = "` + *configFile + `"
+
+[list]
+fields = "` + *configListFields + `"
+
+[new]
+from = "` + *configNewFrom + `"`,
 	)
 	return
 }
