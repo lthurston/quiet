@@ -31,34 +31,38 @@ var newCmd = &cobra.Command{
 		hosts := parser.HostsCollection{}
 		hosts.ReadFromFile(config.GetConfigFile())
 		if host, found := hosts.FindHostByName(from); found {
+			fmt.Println("Copying host \"" + from + "\"")
 			host.Name = newName
 			host.Aliases = []string{}
 
 			if !newSkipInteractive {
 				if len(newName) == 0 {
-					validator := makeNewHostnameValidator(hosts)
-					newName = getNewHostname(newFrom, validator)
+					newName = getNewHostname(newFrom, makeNewHostnameValidator(hosts))
 				}
 
-				validator := makeConfigValueValidator()
-				host.Name = newName
-				host.Config = getNewConfigValues(host.Config, validator)
-
-				newHostSnippet := host.RenderSnippet()
-				if newStdout {
-					fmt.Println(newHostSnippet)
-				} else {
-					// write to file
-				}
-			} else {
-				fmt.Println("Couldn't find host or empty: \"" + from + "\"")
+				host.Config = getNewConfigValues(host.Config, makeConfigValueValidator())
 			}
+			host.Name = newName
+			newHostSnippet := host.RenderSnippet()
+			if newStdout {
+				fmt.Println(newHostSnippet)
+			} else {
+				// write to file
+			}
+
+		} else {
+			fmt.Println("Couldn't find host or empty: \"" + from + "\"")
 		}
 	},
 }
 
-func defaultValueValidator(value string) bool {
+func hostnameRegexValidator(value string) bool {
 	match, _ := regexp.MatchString("^[\\.\\-a-zA-Z0-9]+$", value)
+	return match
+}
+
+func configRegexValidator(value string) bool {
+	match, _ := regexp.MatchString("^[\\.\\-a-zA-Z0-9 ~\\/_]+$", value)
 	return match
 }
 
@@ -66,7 +70,7 @@ func makeConfigValueValidator() inputValidator {
 	return func(value string) error {
 		var err error
 
-		if !defaultValueValidator(value) {
+		if !configRegexValidator(value) {
 			return errors.New("Host name contains illegal character(s)")
 		}
 
@@ -77,7 +81,7 @@ func makeConfigValueValidator() inputValidator {
 func makeNewHostnameValidator(hosts parser.HostsCollection) inputValidator {
 	return func(value string) error {
 		var err error
-		if !defaultValueValidator(value) {
+		if !hostnameRegexValidator(value) {
 			return errors.New("Host name contains illegal character(s)")
 		}
 
