@@ -41,6 +41,7 @@ var newCmd = &cobra.Command{
 				}
 
 				validator := makeConfigValueValidator()
+				host.Name = newName
 				host.Config = getNewConfigValues(host.Config, validator)
 
 				newHostSnippet := host.RenderSnippet()
