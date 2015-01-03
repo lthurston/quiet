@@ -24,14 +24,12 @@ var newCmd = &cobra.Command{
 	Long:  `New appends a new host to your SSH configuration based on other host`,
 	Run: func(cmd *cobra.Command, args []string) {
 		from := config.GetConfigNewFrom()
-		fmt.Println(from)
 		if len(newFrom) > 0 {
 			from = newFrom
 		}
 
 		hosts := parser.HostsCollection{}
 		hosts.ReadFromFile(config.GetConfigFile())
-		fmt.Println(from)
 		if host, found := hosts.FindHostByName(from); found {
 			host.Name = newName
 			host.Aliases = []string{}
@@ -105,9 +103,9 @@ func getNewHostname(newFrom string, validator inputValidator) string {
 }
 
 func getNewConfigValues(config map[string]string, validator inputValidator) map[string]string {
-	var newConfig map[string]string
+	newConfig := make(map[string]string)
 	for key, value := range config {
-		newConfig[key] = inputWithDefault(key+": ", value)
+		newConfig[key] = inputWithDefault(key+" [default is \""+value+"\"]: ", value)
 	}
 	return newConfig
 }
