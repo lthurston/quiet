@@ -9,6 +9,7 @@ import (
 
 	"github.com/lthurston/quiet/config"
 	"github.com/lthurston/quiet/parser"
+	"github.com/lthurston/quiet/writer"
 
 	"github.com/spf13/cobra"
 )
@@ -47,7 +48,7 @@ var newCmd = &cobra.Command{
 			if newStdout {
 				fmt.Println(newHostSnippet)
 			} else {
-				// write to file
+				writer.Append(newHostSnippet)
 			}
 
 		} else {

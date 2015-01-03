@@ -1,67 +1,135 @@
 package writer
 
 import (
-	"bufio"
-	"bytes"
+	"fmt"
 	"io"
+	"os"
+	"strconv"
 	"strings"
+
+	"github.com/lthurston/quiet/config"
 )
 
-// SpliceInto splices a new section into a buffer
-func SpliceInto(lineStart, lineEnd int, spliceContent string, readSeeker io.ReadSeeker, buffer *bytes.Buffer) {
-	var parts []string
-
-	scanner := bufio.NewScanner(readSeeker)
-
-	if lineStart > 0 {
-		firstPart := getLines(0, lineStart, scanner)
-		if len(firstPart) > 0 {
-			parts = append(parts, firstPart)
-		}
-	}
-
-	if len(spliceContent) > 0 {
-		parts = append(parts, spliceContent)
-	}
-
-	if lineEnd > 0 {
-		// Reset the reader so we can read again
-		readSeeker.Seek(0, 0)
-		scanner = bufio.NewScanner(readSeeker)
-		lastPart := getLines(lineEnd, 0, scanner)
-		if len(lastPart) > 0 {
-			parts = append(parts, lastPart)
-		}
-	}
-
-	combinedParts := strings.Join(parts, "\n")
-
-	buffer.WriteString(combinedParts)
+type mapping struct {
+	from string
+	to   string
 }
 
-// GetLines gets a section of lines from lineStart to lineEnd
-func getLines(lineStart, lineEnd int, scanner *bufio.Scanner) string {
-	var lines []string
-	lineIndex := 0
+// Replace replaces the file
+func Replace(content string) error {
+	var err error
+	backup()
+	return err
+}
 
-	// Skip the junk
-	if lineStart > 0 {
-		for scanner.Scan() {
-			if lineStart == lineIndex {
-				break
+// Append does what it sounds like
+func Append(contents string) error {
+	f, err := os.OpenFile(config.GetConfigFile(), os.O_APPEND|os.O_WRONLY, 0644)
+	defer f.Close()
+	if err != nil {
+		return err
+	}
+
+	backup()
+	_, err = f.WriteString(contents)
+	if err != nil {
+		return err
+	}
+	return err
+}
+
+func backup() {
+	filename := config.GetConfigFile()
+	backupsToStore := 5
+	appendGlob := ".quiet.bak.*"
+	err := rotateBackups(getBackupRotationMapping(backupsToStore, filename+appendGlob))
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	firstBackup := replaceGlobWithInt(filename+appendGlob, 1)
+	err = copyFile(filename, firstBackup)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	os.Exit(1)
+}
+
+func rotateBackups(rotationMapping []mapping) error {
+	var err error
+	for _, renameMappings := range rotationMapping {
+		exists, err := fileExists(renameMappings.to)
+		if err != nil {
+			return err
+		}
+		if exists {
+			err := os.Remove(renameMappings.to)
+			if err != nil {
+				return err
 			}
-			lineIndex++
+		}
+		err = renameFile(renameMappings.from, renameMappings.to)
+		if err != nil {
+			return err
 		}
 	}
+	return err
+}
 
-	// Grab the goods
-	for scanner.Scan() {
-		if lineEnd == lineIndex {
-			break
-		}
-		lines = append(lines, scanner.Text())
-		lineIndex++
+func copyFile(source, target string) error {
+	in, err := os.Open(source)
+	if err != nil {
+		return err
 	}
+	defer in.Close()
+	out, err := os.Create(target)
+	if err != nil {
+		return err
+	}
+	defer out.Close()
+	_, err = io.Copy(out, in)
+	err = out.Close()
+	return err
+}
 
-	return strings.Join(lines, "\n")
+func renameFile(source, target string) error {
+	var exists bool
+	var err error
+	exists, err = fileExists(source)
+	if err != nil {
+		return err
+	}
+	if exists {
+		err = os.Rename(source, target)
+		if err != nil {
+			return err
+		}
+	}
+	return err
+}
+
+func fileExists(filename string) (bool, error) {
+	fi, err := os.Stat(filename)
+	if err != nil {
+		if !os.IsNotExist(err) {
+			return false, err
+		}
+	}
+	var err2 error
+	return fi != nil, err2
+}
+
+func getBackupRotationMapping(count int, appendGlob string) (rotationMapping []mapping) {
+	for i := count - 1; i >= 1; i-- {
+		k := replaceGlobWithInt(appendGlob, i)
+		v := replaceGlobWithInt(appendGlob, i+1)
+		rotationMapping = append(rotationMapping, mapping{from: k, to: v})
+	}
+	return
+}
+
+func replaceGlobWithInt(appendGlob string, i int) string {
+	return strings.Replace(appendGlob, "*", strconv.Itoa(i), 1)
 }

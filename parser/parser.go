@@ -149,10 +149,10 @@ func (hosts HostsCollection) FindHostByName(name string) (host, bool) {
 // RenderSnippet renders a host snippet
 func (host host) RenderSnippet() string {
 	tmpl, err := textTemplate.New("snip").Parse(`
-Host {{.Name}}{{if .Aliases}}{{range .Aliases}} {{.}}{{end}}{{end}}	
+Host {{.Name}}{{if .Aliases}}{{range .Aliases}} {{.}}{{end}}{{end}}
 	{{range $key, $value := .Config	 }}{{$key}} {{$value}}
 	{{end}}
-		`)
+`)
 	if err != nil {
 		panic(err)
 	}
