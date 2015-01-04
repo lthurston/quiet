@@ -1,7 +1,6 @@
 package writer
 
 import (
-	"fmt"
 	"io"
 	"os"
 	"strconv"
@@ -10,15 +9,14 @@ import (
 	"github.com/lthurston/quiet/config"
 )
 
-type mapping struct {
+type fileNameMap struct {
 	from string
 	to   string
 }
 
 // Replace replaces the file
 func Replace(content string) error {
-	var err error
-	backup()
+	err := backup()
 	return err
 }
 
@@ -30,7 +28,11 @@ func Append(contents string) error {
 		return err
 	}
 
-	backup()
+	err = backup()
+	if err != nil {
+		return err
+	}
+
 	_, err = f.WriteString(contents)
 	if err != nil {
 		return err
@@ -38,26 +40,24 @@ func Append(contents string) error {
 	return err
 }
 
-func backup() {
+func backup() error {
 	filename := config.GetConfigFile()
 	backupsToStore := 5
 	appendGlob := ".quiet.bak.*"
 	err := rotateBackups(getBackupRotationMapping(backupsToStore, filename+appendGlob))
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		return err
 	}
 	firstBackup := replaceGlobWithInt(filename+appendGlob, 1)
 	err = copyFile(filename, firstBackup)
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		return err
 	}
 
-	os.Exit(1)
+	return err
 }
 
-func rotateBackups(rotationMapping []mapping) error {
+func rotateBackups(rotationMapping []fileNameMap) error {
 	var err error
 	for _, renameMappings := range rotationMapping {
 		exists, err := fileExists(renameMappings.to)
@@ -121,11 +121,11 @@ func fileExists(filename string) (bool, error) {
 	return fi != nil, err2
 }
 
-func getBackupRotationMapping(count int, appendGlob string) (rotationMapping []mapping) {
+func getBackupRotationMapping(count int, appendGlob string) (rotationMapping []fileNameMap) {
 	for i := count - 1; i >= 1; i-- {
 		k := replaceGlobWithInt(appendGlob, i)
 		v := replaceGlobWithInt(appendGlob, i+1)
-		rotationMapping = append(rotationMapping, mapping{from: k, to: v})
+		rotationMapping = append(rotationMapping, fileNameMap{from: k, to: v})
 	}
 	return
 }
