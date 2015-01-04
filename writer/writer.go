@@ -2,6 +2,7 @@ package writer
 
 import (
 	"io"
+	"math/rand"
 	"os"
 	"strconv"
 	"strings"
@@ -12,6 +13,36 @@ import (
 type fileNameMap struct {
 	from string
 	to   string
+}
+
+const (
+	appendGlob = ".quiet.bak.*"
+	tempGlob   = ".quiet.tmp.*"
+)
+
+// Undo swaps most recent backup with previous
+func Undo() error {
+	var err error
+	filename := config.GetConfigFile()
+	firstBackup := replaceGlobWithInt(filename+appendGlob, 1)
+	tmpFilename := getTempFilename(filename + tempGlob)
+
+	// Not handling errors at all -- fix it
+	renameFile(firstBackup, tmpFilename)
+	renameFile(filename, firstBackup)
+	renameFile(tmpFilename, filename)
+
+	return err
+}
+
+func getTempFilename(filename string) string {
+	exists := true
+	var filenameR string
+	for exists {
+		filenameR = replaceGlobWithInt(filename, rand.Int())
+		exists, _ = fileExists(filenameR)
+	}
+	return filenameR
 }
 
 // Replace replaces the file
@@ -43,7 +74,6 @@ func Append(contents string) error {
 func backup() error {
 	filename := config.GetConfigFile()
 	backupsToStore := 5
-	appendGlob := ".quiet.bak.*"
 	err := rotateBackups(getBackupRotationMapping(backupsToStore, filename+appendGlob))
 	if err != nil {
 		return err
