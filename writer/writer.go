@@ -20,7 +20,7 @@ const (
 	tempGlob   = ".quiet.tmp.*"
 )
 
-// Undo swaps most recent backup with previous
+// Undo swaps most recent backup with current file
 func Undo() error {
 	var err error
 	filename := config.GetConfigFile()
