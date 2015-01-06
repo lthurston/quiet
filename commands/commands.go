@@ -26,6 +26,7 @@ func addCommands() {
 	QuietCmd.AddCommand(listCmd)
 	QuietCmd.AddCommand(exportCmd)
 	QuietCmd.AddCommand(undoCmd)
+	QuietCmd.AddCommand(warpCmd)
 
 	// find a better spot to put the flags
 	newCmd.Flags().StringVarP(&newFrom, "from", "f", "", "host to use as template")
