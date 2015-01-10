@@ -33,18 +33,18 @@ var newCmd = &cobra.Command{
 		hosts.ReadFromFile(config.GetConfigFile())
 		if host, found := hosts.FindHostByName(from); found {
 			fmt.Println("Copying host \"" + from + "\"")
-			host.Name = newName
-			host.Aliases = []string{}
+			host.SetName(newName)
+			host.SetAliases([]string{})
 
 			if !newSkipInteractive {
 				if len(newName) == 0 {
 					newName = getNewHostname(newFrom, makeNewHostnameValidator(hosts))
 				}
 
-				host.Config = getNewConfigValues(host.Config, makeConfigValueValidator())
+				host.SetConfig(getNewConfigValues(host.GetConfig(), makeConfigValueValidator()))
 			}
-			host.Name = newName
-			newHostSnippet := host.RenderSnippet()
+			host.SetName(newName)
+			newHostSnippet := host.String()
 			if newStdout {
 				fmt.Println(newHostSnippet)
 			} else {

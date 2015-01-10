@@ -2,97 +2,16 @@ package parser
 
 import (
 	"bufio"
-	"bytes"
 	"os"
 	"regexp"
 	"strings"
-	textTemplate "text/template"
+
+	h "github.com/lthurston/quiet/host"
 )
-
-type host struct {
-	name      string
-	aliases   []string
-	config    map[string]string
-	startLine int
-	endLine   int
-}
-
-func (host *host) addConfigFromString(line string) {
-	line = strings.TrimSpace(line)
-	sepIndex := strings.IndexAny(line, " \t")
-	config, value := line[0:sepIndex], line[sepIndex+1:]
-	host.config[config] = value
-}
-
-func (host *host) SetName(name string) {
-	host.name = name
-}
-
-func (host host) GetName() string {
-	return host.name
-}
-
-func (host *host) SetAliases(aliases []string) {
-	host.aliases = aliases
-}
-
-func (host host) GetAliases() []string {
-	return host.aliases
-}
-
-func (host *host) SetConfig(config map[string]string) {
-	host.config = config
-}
-
-func (host host) GetConfig() map[string]string {
-	return host.config
-}
-
-func (host *host) SetStartLine(startLine int) {
-	host.startLine = startLine
-}
-
-func (host host) GetStartLine() int {
-	return host.startLine
-}
-
-func (host *host) SetEndLine(endLine int) {
-	host.endLine = endLine
-}
-
-func (host host) GetEndLine() int {
-	return host.endLine
-}
-
-// RenderSnippet renders a host snippet
-func (host host) RenderSnippet() string {
-	tmpl, err := textTemplate.New("snip").Parse(`
-Host {{.GetName}}{{if .GetAliases}}{{range .GetAliases}} {{.}}{{end}}{{end}}
-	{{range $key, $value := .GetConfig	 }}{{$key}} {{$value}}
-{{end}}
-`)
-	if err != nil {
-		panic(err)
-	}
-	buf := new(bytes.Buffer)
-
-	err = tmpl.Execute(buf, host)
-	if err != nil {
-		panic(err)
-	}
-	return buf.String()
-}
-
-// MakeHost returns a host!
-func MakeHost() host {
-	i := host{}
-	i.SetConfig(make(map[string]string))
-	return i
-}
 
 // HostsCollection is a collection of hosts from the config file!
 type HostsCollection struct {
-	Hosts []host
+	Hosts []h.Host
 }
 
 // Count counts
@@ -131,7 +50,7 @@ func (hosts *HostsCollection) fromScanner(s *bufio.Scanner) {
 	lastNonSkippableLine := 0
 	lineIndex := 0
 
-	host := MakeHost()
+	host := h.MakeHost()
 	for s.Scan() {
 		lineIndex++
 		line := s.Text()
@@ -142,14 +61,14 @@ func (hosts *HostsCollection) fromScanner(s *bufio.Scanner) {
 					hosts.Hosts = append(hosts.Hosts, host)
 				}
 				foundFirstHostLine = true
-				host = MakeHost()
+				host = h.MakeHost()
 				host.SetStartLine(lineIndex)
 				hostNames := getHostNames(line)
 				host.SetName(hostNames[0])
 				host.SetAliases(hostNames[1:])
 			} else {
 				if foundFirstHostLine {
-					host.addConfigFromString(line)
+					host.AddConfigFromString(line)
 				}
 			}
 			lastNonSkippableLine = lineIndex
@@ -163,13 +82,13 @@ func (hosts *HostsCollection) fromScanner(s *bufio.Scanner) {
 }
 
 // FindHostByName finds a host by name (not by host aliases!)
-func (hosts HostsCollection) FindHostByName(name string) (host, bool) {
+func (hosts HostsCollection) FindHostByName(name string) (h.Host, bool) {
 	for _, host := range hosts.Hosts {
 		if host.GetName() == name {
 			return host, true
 		}
 	}
-	return MakeHost(), false
+	return h.MakeHost(), false
 }
 
 var ignoreLineRegexes = []string{

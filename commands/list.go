@@ -21,10 +21,10 @@ var listCmd = &cobra.Command{
 		widths := getColumnWidths(hosts)
 		fields := strings.Split(config.GetConfigListFields(), ",")
 		for _, host := range hosts.Hosts {
-			fmt.Printf("%-"+strconv.Itoa(widths["Name"]+1)+"s", host.Name)
+			fmt.Printf("%-"+strconv.Itoa(widths["Name"]+1)+"s", host.GetName())
 			for _, field := range fields {
 				fieldName := strings.TrimSpace(field)
-				fmt.Printf("%-"+strconv.Itoa(widths[fieldName]+1)+"s", host.Config[fieldName])
+				fmt.Printf("%-"+strconv.Itoa(widths[fieldName]+1)+"s", host.GetConfig()[fieldName])
 			}
 			fmt.Println("")
 		}
@@ -34,10 +34,10 @@ var listCmd = &cobra.Command{
 func getColumnWidths(hosts parser.HostsCollection) map[string]int {
 	widths := make(map[string]int)
 	for _, host := range hosts.Hosts {
-		if length := len([]rune(host.Name)); length > widths["Name"] {
+		if length := len([]rune(host.GetName())); length > widths["Name"] {
 			widths["Name"] = length
 		}
-		for key, value := range host.Config {
+		for key, value := range host.GetConfig() {
 			if length := len([]rune(value)); length > widths[key] {
 				widths[key] = length
 			}

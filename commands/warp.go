@@ -16,7 +16,7 @@ var warpCmd = &cobra.Command{
 		hosts := parser.HostsCollection{}
 		hosts.ReadFromFile(config.GetConfigFile())
 		for _, host := range hosts.Hosts {
-			fmt.Println(host.Name)
+			fmt.Println(host.GetName())
 		}
 	},
 }
