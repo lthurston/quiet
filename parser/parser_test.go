@@ -44,11 +44,11 @@ Host junkfood
 	if count := hosts.Count(); count != 1 {
 		t.Errorf("Expecting 1 hosts in this config; got %v", count)
 	}
-	if hosts.Hosts[0].StartLine != 2 {
-		t.Errorf("Expecting first host to begin on line 2; got %v", hosts.Hosts[0].StartLine)
+	if hosts.Hosts[0].GetStartLine() != 2 {
+		t.Errorf("Expecting first host to begin on line 2; got %v", hosts.Hosts[0].GetStartLine())
 	}
-	if hosts.Hosts[0].EndLine != 8 {
-		t.Errorf("Expecting first host to end on line 8; got %v", hosts.Hosts[0].EndLine)
+	if hosts.Hosts[0].GetEndLine() != 8 {
+		t.Errorf("Expecting first host to end on line 8; got %v", hosts.Hosts[0].GetEndLine())
 	}
 
 }
@@ -85,17 +85,17 @@ Host ormulex-qa
 	if count := hosts.Count(); count != 2 {
 		t.Errorf("Expecting 2 hosts in this config; got %v", count)
 	}
-	if hosts.Hosts[0].StartLine != 13 {
-		t.Errorf("Expecting first host to begin on line 13; got %v", hosts.Hosts[0].StartLine)
+	if hosts.Hosts[0].GetStartLine() != 13 {
+		t.Errorf("Expecting first host to begin on line 13; got %v", hosts.Hosts[0].GetStartLine())
 	}
-	if hosts.Hosts[0].EndLine != 16 {
-		t.Errorf("Expecting first host to end on line 16; got %v", hosts.Hosts[0].EndLine)
+	if hosts.Hosts[0].GetEndLine() != 16 {
+		t.Errorf("Expecting first host to end on line 16; got %v", hosts.Hosts[0].GetEndLine())
 	}
-	if hosts.Hosts[1].StartLine != 18 {
-		t.Errorf("Expecting second host to begin on line 18; got %v", hosts.Hosts[1].StartLine)
+	if hosts.Hosts[1].GetStartLine() != 18 {
+		t.Errorf("Expecting second host to begin on line 18; got %v", hosts.Hosts[1].GetStartLine())
 	}
-	if hosts.Hosts[1].EndLine != 21 {
-		t.Errorf("Expecting second host to end on line 21; got %v", hosts.Hosts[1].EndLine)
+	if hosts.Hosts[1].GetEndLine() != 21 {
+		t.Errorf("Expecting second host to end on line 21; got %v", hosts.Hosts[1].GetEndLine())
 	}
 }
 
@@ -133,14 +133,14 @@ Host ormulex-qa
 	if !found {
 		t.Errorf("Couldn't find the host using hosts.FindHostByName! (#1)")
 	}
-	if found && host.Name != "ormulex-dev" {
+	if found && host.GetName() != "ormulex-dev" {
 		t.Errorf("hosts.FindHostByName found the wrong host (#2)")
 	}
 	host, found = hosts.FindHostByName("ormulex-qa")
 	if !found {
 		t.Errorf("Couldn't find the host using hosts.FindHostByName! (#3)")
 	}
-	if found && host.Name != "ormulex-qa" {
+	if found && host.GetName() != "ormulex-qa" {
 		t.Errorf("hosts.FindHostByName found the wrong host (#4)")
 	}
 
@@ -160,25 +160,26 @@ func TestRenderSnippet(t *testing.T) {
 	config := map[string]string{"User": "gushaguy", "HostName": "skeins.com"}
 
 	host := parser.MakeHost()
-	host.Name = name
-	host.Aliases = aliases
-	host.Config = config
-	host.EndLine, host.StartLine = 0, 0
+	host.SetName(name)
+	host.SetAliases(aliases)
+	host.SetConfig(config)
+	host.SetEndLine(0)
+	host.SetStartLine(0)
 
 	rendered := host.RenderSnippet()
 
 	hosts := parser.HostsCollection{}
 	hosts.ReadFromString(rendered)
 
-	if hosts.Hosts[0].Name != "skeins" {
-		t.Errorf("Wrong host name, expecting: %s got: %s", name, hosts.Hosts[0].Name)
+	if hosts.Hosts[0].GetName() != "skeins" {
+		t.Errorf("Wrong host name, expecting: %s got: %s", name, hosts.Hosts[0].GetName())
 	}
 
-	if !reflect.DeepEqual(hosts.Hosts[0].Aliases, aliases) {
-		t.Errorf("Wrong aliases, expecting: %s got: %s", aliases, hosts.Hosts[0].Aliases)
+	if !reflect.DeepEqual(hosts.Hosts[0].GetAliases(), aliases) {
+		t.Errorf("Wrong aliases, expecting: %s got: %s", aliases, hosts.Hosts[0].GetAliases())
 	}
 
-	if !reflect.DeepEqual(hosts.Hosts[0].Config, config) {
-		t.Errorf("Wrong config, expecting: %s got: %s", config, hosts.Hosts[0].Config)
+	if !reflect.DeepEqual(hosts.Hosts[0].GetConfig(), config) {
+		t.Errorf("Wrong config, expecting: %s got: %s", config, hosts.Hosts[0].GetConfig())
 	}
 }

@@ -10,25 +10,65 @@ import (
 )
 
 type host struct {
-	Name      string
-	Aliases   []string
-	Config    map[string]string
-	StartLine int
-	EndLine   int
+	name      string
+	aliases   []string
+	config    map[string]string
+	startLine int
+	endLine   int
 }
 
 func (host *host) addConfigFromString(line string) {
 	line = strings.TrimSpace(line)
 	sepIndex := strings.IndexAny(line, " \t")
 	config, value := line[0:sepIndex], line[sepIndex+1:]
-	host.Config[config] = value
+	host.config[config] = value
+}
+
+func (host *host) SetName(name string) {
+	host.name = name
+}
+
+func (host host) GetName() string {
+	return host.name
+}
+
+func (host *host) SetAliases(aliases []string) {
+	host.aliases = aliases
+}
+
+func (host host) GetAliases() []string {
+	return host.aliases
+}
+
+func (host *host) SetConfig(config map[string]string) {
+	host.config = config
+}
+
+func (host host) GetConfig() map[string]string {
+	return host.config
+}
+
+func (host *host) SetStartLine(startLine int) {
+	host.startLine = startLine
+}
+
+func (host host) GetStartLine() int {
+	return host.startLine
+}
+
+func (host *host) SetEndLine(endLine int) {
+	host.endLine = endLine
+}
+
+func (host host) GetEndLine() int {
+	return host.endLine
 }
 
 // RenderSnippet renders a host snippet
 func (host host) RenderSnippet() string {
 	tmpl, err := textTemplate.New("snip").Parse(`
-Host {{.Name}}{{if .Aliases}}{{range .Aliases}} {{.}}{{end}}{{end}}
-	{{range $key, $value := .Config	 }}{{$key}} {{$value}}
+Host {{.GetName}}{{if .GetAliases}}{{range .GetAliases}} {{.}}{{end}}{{end}}
+	{{range $key, $value := .GetConfig	 }}{{$key}} {{$value}}
 {{end}}
 `)
 	if err != nil {
@@ -46,7 +86,7 @@ Host {{.Name}}{{if .Aliases}}{{range .Aliases}} {{.}}{{end}}{{end}}
 // MakeHost returns a host!
 func MakeHost() host {
 	i := host{}
-	i.Config = make(map[string]string)
+	i.SetConfig(make(map[string]string))
 	return i
 }
 
@@ -84,9 +124,6 @@ func (hosts *HostsCollection) ReadFromString(contents string) {
 func (hosts *HostsCollection) fromScanner(s *bufio.Scanner) {
 	skippableLine := getLineMatcher(ignoreLineRegexes)
 	hostLine := getLineMatcher([]string{`^Host.+$`})
-	//configLine := getLineMatcher([]string{`^\s+.+\s.+$`})
-
-	// tmp := []string{}
 
 	foundFirstHostLine := false
 
@@ -101,15 +138,15 @@ func (hosts *HostsCollection) fromScanner(s *bufio.Scanner) {
 		if !skippableLine(line) {
 			if hostLine(line) {
 				if foundFirstHostLine {
-					host.EndLine = lastNonSkippableLine
+					host.SetEndLine(lastNonSkippableLine)
 					hosts.Hosts = append(hosts.Hosts, host)
 				}
 				foundFirstHostLine = true
 				host = MakeHost()
-				host.StartLine = lineIndex
+				host.SetStartLine(lineIndex)
 				hostNames := getHostNames(line)
-				host.Name = hostNames[0]
-				host.Aliases = hostNames[1:]
+				host.SetName(hostNames[0])
+				host.SetAliases(hostNames[1:])
 			} else {
 				if foundFirstHostLine {
 					host.addConfigFromString(line)
@@ -120,7 +157,7 @@ func (hosts *HostsCollection) fromScanner(s *bufio.Scanner) {
 	}
 
 	if foundFirstHostLine {
-		host.EndLine = lastNonSkippableLine
+		host.SetEndLine(lastNonSkippableLine)
 		hosts.Hosts = append(hosts.Hosts, host)
 	}
 }
@@ -128,7 +165,7 @@ func (hosts *HostsCollection) fromScanner(s *bufio.Scanner) {
 // FindHostByName finds a host by name (not by host aliases!)
 func (hosts HostsCollection) FindHostByName(name string) (host, bool) {
 	for _, host := range hosts.Hosts {
-		if host.Name == name {
+		if host.GetName() == name {
 			return host, true
 		}
 	}
