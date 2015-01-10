@@ -17,13 +17,6 @@ type host struct {
 	EndLine   int
 }
 
-// MakeHost returns a host!
-func MakeHost() host {
-	i := host{}
-	i.Config = make(map[string]string)
-	return i
-}
-
 func (host *host) addConfigFromString(line string) {
 	line = strings.TrimSpace(line)
 	sepIndex := strings.IndexAny(line, " \t")
@@ -31,15 +24,35 @@ func (host *host) addConfigFromString(line string) {
 	host.Config[config] = value
 }
 
+// RenderSnippet renders a host snippet
+func (host host) RenderSnippet() string {
+	tmpl, err := textTemplate.New("snip").Parse(`
+Host {{.Name}}{{if .Aliases}}{{range .Aliases}} {{.}}{{end}}{{end}}
+	{{range $key, $value := .Config	 }}{{$key}} {{$value}}
+{{end}}
+`)
+	if err != nil {
+		panic(err)
+	}
+	buf := new(bytes.Buffer)
+
+	err = tmpl.Execute(buf, host)
+	if err != nil {
+		panic(err)
+	}
+	return buf.String()
+}
+
+// MakeHost returns a host!
+func MakeHost() host {
+	i := host{}
+	i.Config = make(map[string]string)
+	return i
+}
+
 // HostsCollection is a collection of hosts from the config file!
 type HostsCollection struct {
 	Hosts []host
-}
-
-var ignoreLineRegexes = []string{
-	`^\s*$`,
-	`^\s*#`,
-	`^\s*Host \*`,
 }
 
 // Count counts
@@ -65,30 +78,6 @@ func (hosts *HostsCollection) ReadFromString(contents string) {
 
 	scanner := bufio.NewScanner(r)
 	hosts.fromScanner(scanner)
-}
-
-// An function that you pass a string to, and it will return true if
-// the string doesn't match one of the ignoreLineRegexes
-type lineMatcher func(input string) bool
-
-// ignoreLines returns an ignoreLineFunc
-func getLineMatcher(regexStrings []string) lineMatcher {
-	regexes := []*regexp.Regexp{}
-	for _, regexString := range regexStrings {
-		regexes = append(regexes, regexp.MustCompile(regexString))
-	}
-	return func(input string) bool {
-		for _, regex := range regexes {
-			if regex.Match([]byte(input)) {
-				return true
-			}
-		}
-		return false
-	}
-}
-
-func getHostNames(line string) []string {
-	return strings.Fields(line)[1:]
 }
 
 // fromScanner populates the host from a bufio.Scanner
@@ -146,22 +135,32 @@ func (hosts HostsCollection) FindHostByName(name string) (host, bool) {
 	return MakeHost(), false
 }
 
-// RenderSnippet renders a host snippet
-func (host host) RenderSnippet() string {
-	tmpl, err := textTemplate.New("snip").Parse(`
-Host {{.Name}}{{if .Aliases}}{{range .Aliases}} {{.}}{{end}}{{end}}
-	{{range $key, $value := .Config	 }}{{$key}} {{$value}}
-	{{end}}
-`)
-	if err != nil {
-		panic(err)
-	}
-	buf := new(bytes.Buffer)
+var ignoreLineRegexes = []string{
+	`^\s*$`,
+	`^\s*#`,
+	`^\s*Host \*`,
+}
 
-	err = tmpl.Execute(buf, host)
-	if err != nil {
-		panic(err)
-	}
+// An function that you pass a string to, and it will return true if
+// the string doesn't match one of the ignoreLineRegexes
+type lineMatcher func(input string) bool
 
-	return buf.String()
+// ignoreLines returns an ignoreLineFunc
+func getLineMatcher(regexStrings []string) lineMatcher {
+	regexes := []*regexp.Regexp{}
+	for _, regexString := range regexStrings {
+		regexes = append(regexes, regexp.MustCompile(regexString))
+	}
+	return func(input string) bool {
+		for _, regex := range regexes {
+			if regex.Match([]byte(input)) {
+				return true
+			}
+		}
+		return false
+	}
+}
+
+func getHostNames(line string) []string {
+	return strings.Fields(line)[1:]
 }
