@@ -28,8 +28,8 @@ func (host *Host) SetName(name string) {
 	host.name = name
 }
 
-// GetName gets name
-func (host Host) GetName() string {
+// Name gets name
+func (host Host) Name() string {
 	return host.name
 }
 
@@ -38,8 +38,8 @@ func (host *Host) SetAliases(aliases []string) {
 	host.aliases = aliases
 }
 
-// GetAliases gets aliases
-func (host Host) GetAliases() []string {
+// Aliases gets aliases
+func (host Host) Aliases() []string {
 	return host.aliases
 }
 
@@ -48,8 +48,8 @@ func (host *Host) SetConfig(config map[string]string) {
 	host.config = config
 }
 
-// GetConfig gets config
-func (host Host) GetConfig() map[string]string {
+// Config gets config
+func (host Host) Config() map[string]string {
 	return host.config
 }
 
@@ -58,8 +58,8 @@ func (host *Host) SetStartLine(startLine int) {
 	host.startLine = startLine
 }
 
-// GetStartLine get startLine
-func (host Host) GetStartLine() int {
+// StartLine get startLine
+func (host Host) StartLine() int {
 	return host.startLine
 }
 
@@ -68,17 +68,17 @@ func (host *Host) SetEndLine(endLine int) {
 	host.endLine = endLine
 }
 
-// GetEndLine gets the end line
-func (host Host) GetEndLine() int {
+// EndLine gets the end line
+func (host Host) EndLine() int {
 	return host.endLine
 }
 
 // RenderSnippet renders a host snippet
 func (host Host) String() string {
 	tmpl, err := template.New("snip").Parse(`
-Host {{.GetName}}{{if .GetAliases}}{{range .GetAliases}} {{.}}{{end}}{{end}}
-    {{range $key, $value := .GetConfig	 }}{{$key}} {{$value}}
-    {{end}}
+Host {{.Name}}{{if .Aliases}}{{range .Aliases}} {{.}}{{end}}{{end}}
+  {{range $key, $value := .Config	 }}{{$key}} {{$value}}
+{{end}}
     `)
 	if err != nil {
 		panic(err)

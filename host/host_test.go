@@ -25,15 +25,15 @@ func TestString(t *testing.T) {
 	hosts := parser.HostsCollection{}
 	hosts.ReadFromString(rendered)
 
-	if hosts.Hosts[0].GetName() != "skeins" {
-		t.Errorf("Wrong host name, expecting: %s got: %s", name, hosts.Hosts[0].GetName())
+	if hosts.GetIndex(0).Name() != "skeins" {
+		t.Errorf("Wrong host name, expecting: %s got: %s", name, hosts.GetIndex(0).Name())
 	}
 
-	if !reflect.DeepEqual(hosts.Hosts[0].GetAliases(), aliases) {
-		t.Errorf("Wrong aliases, expecting: %s got: %s", aliases, hosts.Hosts[0].GetAliases())
+	if !reflect.DeepEqual(hosts.GetIndex(0).Aliases(), aliases) {
+		t.Errorf("Wrong aliases, expecting: %s got: %s", aliases, hosts.GetIndex(0).Aliases())
 	}
 
-	if !reflect.DeepEqual(hosts.Hosts[0].GetConfig(), config) {
-		t.Errorf("Wrong config, expecting: %s got: %s", config, hosts.Hosts[0].GetConfig())
+	if !reflect.DeepEqual(hosts.GetIndex(0).Config(), config) {
+		t.Errorf("Wrong config, expecting: %s got: %s", config, hosts.GetIndex(0).Config())
 	}
 }

@@ -41,7 +41,7 @@ var newCmd = &cobra.Command{
 					newName = getNewHostname(newFrom, makeNewHostnameValidator(hosts))
 				}
 
-				host.SetConfig(getNewConfigValues(host.GetConfig(), makeConfigValueValidator()))
+				host.SetConfig(getNewConfigValues(host.Config(), makeConfigValueValidator()))
 			}
 			host.SetName(newName)
 			newHostSnippet := host.String()

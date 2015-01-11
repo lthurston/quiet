@@ -43,13 +43,12 @@ Host junkfood
 	if count := hosts.Count(); count != 1 {
 		t.Errorf("Expecting 1 hosts in this config; got %v", count)
 	}
-	if hosts.Hosts[0].GetStartLine() != 2 {
-		t.Errorf("Expecting first host to begin on line 2; got %v", hosts.Hosts[0].GetStartLine())
+	if hosts.GetIndex(0).StartLine() != 2 {
+		t.Errorf("Expecting first host to begin on line 2; got %v", hosts.GetIndex(0).StartLine())
 	}
-	if hosts.Hosts[0].GetEndLine() != 8 {
-		t.Errorf("Expecting first host to end on line 8; got %v", hosts.Hosts[0].GetEndLine())
+	if hosts.GetIndex(0).EndLine() != 8 {
+		t.Errorf("Expecting first host to end on line 8; got %v", hosts.GetIndex(0).EndLine())
 	}
-
 }
 
 func TestParse2(t *testing.T) {
@@ -84,17 +83,17 @@ Host ormulex-qa
 	if count := hosts.Count(); count != 2 {
 		t.Errorf("Expecting 2 hosts in this config; got %v", count)
 	}
-	if hosts.Hosts[0].GetStartLine() != 13 {
-		t.Errorf("Expecting first host to begin on line 13; got %v", hosts.Hosts[0].GetStartLine())
+	if hosts.GetIndex(0).StartLine() != 13 {
+		t.Errorf("Expecting first host to begin on line 13; got %v", hosts.GetIndex(0).StartLine())
 	}
-	if hosts.Hosts[0].GetEndLine() != 16 {
-		t.Errorf("Expecting first host to end on line 16; got %v", hosts.Hosts[0].GetEndLine())
+	if hosts.GetIndex(0).EndLine() != 16 {
+		t.Errorf("Expecting first host to end on line 16; got %v", hosts.GetIndex(0).EndLine())
 	}
-	if hosts.Hosts[1].GetStartLine() != 18 {
-		t.Errorf("Expecting second host to begin on line 18; got %v", hosts.Hosts[1].GetStartLine())
+	if hosts.GetIndex(1).StartLine() != 18 {
+		t.Errorf("Expecting second host to begin on line 18; got %v", hosts.GetIndex(1).StartLine())
 	}
-	if hosts.Hosts[1].GetEndLine() != 21 {
-		t.Errorf("Expecting second host to end on line 21; got %v", hosts.Hosts[1].GetEndLine())
+	if hosts.GetIndex(1).EndLine() != 21 {
+		t.Errorf("Expecting second host to end on line 21; got %v", hosts.GetIndex(1).EndLine())
 	}
 }
 
@@ -132,14 +131,14 @@ Host ormulex-qa
 	if !found {
 		t.Errorf("Couldn't find the host using hosts.FindHostByName! (#1)")
 	}
-	if found && host.GetName() != "ormulex-dev" {
+	if found && host.Name() != "ormulex-dev" {
 		t.Errorf("hosts.FindHostByName found the wrong host (#2)")
 	}
 	host, found = hosts.FindHostByName("ormulex-qa")
 	if !found {
 		t.Errorf("Couldn't find the host using hosts.FindHostByName! (#3)")
 	}
-	if found && host.GetName() != "ormulex-qa" {
+	if found && host.Name() != "ormulex-qa" {
 		t.Errorf("hosts.FindHostByName found the wrong host (#4)")
 	}
 

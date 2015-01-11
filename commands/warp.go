@@ -15,8 +15,8 @@ var warpCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		hosts := parser.HostsCollection{}
 		hosts.ReadFromFile(config.GetConfigFile())
-		for _, host := range hosts.Hosts {
-			fmt.Println(host.GetName())
+		for _, host := range hosts.HostPositions {
+			fmt.Println(host.Name())
 		}
 	},
 }

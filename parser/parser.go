@@ -9,14 +9,52 @@ import (
 	h "github.com/lthurston/quiet/host"
 )
 
+// HostPosition keeps track of a set of host configuration and the start and
+// end lines within the HostsCollection
+type HostPosition struct {
+	h.Host
+	startLine int
+	endLine   int
+}
+
+// MakeHostPosition makes a new one of these
+func MakeHostPosition() HostPosition {
+	return HostPosition{Host: h.MakeHost()}
+}
+
+// SetStartLine sets start line
+func (hostPosition *HostPosition) SetStartLine(startLine int) {
+	hostPosition.startLine = startLine
+}
+
+// StartLine get startLine
+func (hostPosition HostPosition) StartLine() int {
+	return hostPosition.startLine
+}
+
+// SetEndLine sets the end line
+func (hostPosition *HostPosition) SetEndLine(endLine int) {
+	hostPosition.endLine = endLine
+}
+
+// EndLine gets the end line
+func (hostPosition HostPosition) EndLine() int {
+	return hostPosition.endLine
+}
+
 // HostsCollection is a collection of hosts from the config file!
 type HostsCollection struct {
-	Hosts []h.Host
+	HostPositions []HostPosition
+}
+
+// GetIndex gets the host position at an index
+func (hosts HostsCollection) GetIndex(i int) HostPosition {
+	return hosts.HostPositions[i]
 }
 
 // Count counts
 func (hosts HostsCollection) Count() int {
-	return len(hosts.Hosts)
+	return len(hosts.HostPositions)
 }
 
 // ReadFromFile loads a HostsCollection with stuff from a fil
@@ -50,7 +88,7 @@ func (hosts *HostsCollection) fromScanner(s *bufio.Scanner) {
 	lastNonSkippableLine := 0
 	lineIndex := 0
 
-	host := h.MakeHost()
+	host := MakeHostPosition()
 	for s.Scan() {
 		lineIndex++
 		line := s.Text()
@@ -58,10 +96,10 @@ func (hosts *HostsCollection) fromScanner(s *bufio.Scanner) {
 			if hostLine(line) {
 				if foundFirstHostLine {
 					host.SetEndLine(lastNonSkippableLine)
-					hosts.Hosts = append(hosts.Hosts, host)
+					hosts.HostPositions = append(hosts.HostPositions, host)
 				}
 				foundFirstHostLine = true
-				host = h.MakeHost()
+				host = MakeHostPosition()
 				host.SetStartLine(lineIndex)
 				hostNames := getHostNames(line)
 				host.SetName(hostNames[0])
@@ -77,18 +115,18 @@ func (hosts *HostsCollection) fromScanner(s *bufio.Scanner) {
 
 	if foundFirstHostLine {
 		host.SetEndLine(lastNonSkippableLine)
-		hosts.Hosts = append(hosts.Hosts, host)
+		hosts.HostPositions = append(hosts.HostPositions, host)
 	}
 }
 
 // FindHostByName finds a host by name (not by host aliases!)
-func (hosts HostsCollection) FindHostByName(name string) (h.Host, bool) {
-	for _, host := range hosts.Hosts {
-		if host.GetName() == name {
+func (hosts HostsCollection) FindHostByName(name string) (HostPosition, bool) {
+	for _, host := range hosts.HostPositions {
+		if host.Name() == name {
 			return host, true
 		}
 	}
-	return h.MakeHost(), false
+	return MakeHostPosition(), false
 }
 
 var ignoreLineRegexes = []string{
