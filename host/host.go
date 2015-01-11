@@ -8,11 +8,9 @@ import (
 
 // Host holds host info
 type Host struct {
-	name      string
-	aliases   []string
-	config    map[string]string
-	startLine int
-	endLine   int
+	name    string
+	aliases []string
+	config  map[string]string
 }
 
 // AddConfigFromString scans a line and adds a config item for it
@@ -51,26 +49,6 @@ func (host *Host) SetConfig(config map[string]string) {
 // Config gets config
 func (host Host) Config() map[string]string {
 	return host.config
-}
-
-// SetStartLine sets start line
-func (host *Host) SetStartLine(startLine int) {
-	host.startLine = startLine
-}
-
-// StartLine get startLine
-func (host Host) StartLine() int {
-	return host.startLine
-}
-
-// SetEndLine sets the end line
-func (host *Host) SetEndLine(endLine int) {
-	host.endLine = endLine
-}
-
-// EndLine gets the end line
-func (host Host) EndLine() int {
-	return host.endLine
 }
 
 // RenderSnippet renders a host snippet

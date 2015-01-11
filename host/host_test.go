@@ -17,8 +17,6 @@ func TestString(t *testing.T) {
 	host.SetName(name)
 	host.SetAliases(aliases)
 	host.SetConfig(config)
-	host.SetEndLine(0)
-	host.SetStartLine(0)
 
 	rendered := host.String()
 
