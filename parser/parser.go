@@ -106,7 +106,7 @@ func (hosts *HostsCollection) fromScanner(s *bufio.Scanner) {
 				host.SetAliases(hostNames[1:])
 			} else {
 				if foundFirstHostLine {
-					host.AddConfigFromString(line)
+					host.AddOptionFromString(line)
 				}
 			}
 			lastNonSkippableLine = lineIndex
@@ -156,5 +156,8 @@ func getLineMatcher(regexStrings []string) lineMatcher {
 }
 
 func getHostNames(line string) []string {
-	return strings.Fields(line)[1:]
+	if fields := strings.Fields(line)[1:]; len(fields) > 0 {
+		return fields
+	}
+	return []string{""}
 }

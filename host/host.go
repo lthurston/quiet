@@ -6,19 +6,54 @@ import (
 	"text/template"
 )
 
+// Option contains a keyword and an argument
+type Option struct {
+	keyword  string
+	argument string
+}
+
+// MakeOption creates an optin
+func MakeOption(keyword string, argument string) Option {
+	return Option{keyword: keyword, argument: argument}
+}
+
+// Argument gets the argument
+func (option Option) Argument() string {
+	return option.argument
+}
+
+// Keyword gets the keyword
+func (option Option) Keyword() string {
+	return option.keyword
+}
+
+func (option Option) String() string {
+	return option.keyword + " " + option.argument
+}
+
 // Host holds host info
 type Host struct {
 	name    string
 	aliases []string
-	config  map[string]string
+	options []Option
 }
 
-// AddConfigFromString scans a line and adds a config item for it
-func (host *Host) AddConfigFromString(line string) {
+// GetOptionArgument gets a argument for an option keyword for a host
+func (host Host) GetOptionArgument(keyword string) string {
+	for _, option := range host.options {
+		if option.keyword == keyword {
+			return option.argument
+		}
+	}
+	return ""
+}
+
+// AddOptionFromString scans a line and adds a config item for it
+func (host *Host) AddOptionFromString(line string) {
 	line = strings.TrimSpace(line)
 	sepIndex := strings.IndexAny(line, " \t")
-	config, value := line[0:sepIndex], line[sepIndex+1:]
-	host.config[config] = value
+	keyword, argument := line[0:sepIndex], line[sepIndex+1:]
+	host.options = append(host.options, Option{keyword: keyword, argument: argument})
 }
 
 // SetName sets name
@@ -41,21 +76,26 @@ func (host Host) Aliases() []string {
 	return host.aliases
 }
 
-// SetConfig sets config
-func (host *Host) SetConfig(config map[string]string) {
-	host.config = config
+// SetOptions sets config
+func (host *Host) SetOptions(options []Option) {
+	host.options = options
 }
 
-// Config gets config
-func (host Host) Config() map[string]string {
-	return host.config
+// AddOption adds an option
+func (host *Host) AddOption(keyword, argument string) {
+	host.options = append(host.options, Option{keyword: keyword, argument: argument})
+}
+
+// Options gets config
+func (host Host) Options() []Option {
+	return host.options
 }
 
 // RenderSnippet renders a host snippet
 func (host Host) String() string {
 	tmpl, err := template.New("snip").Parse(`
 Host {{.Name}}{{if .Aliases}}{{range .Aliases}} {{.}}{{end}}{{end}}
-  {{range $key, $value := .Config	 }}{{$key}} {{$value}}
+{{range .Options }}	{{.}}
 {{end}}
     `)
 	if err != nil {
@@ -73,6 +113,6 @@ Host {{.Name}}{{if .Aliases}}{{range .Aliases}} {{.}}{{end}}{{end}}
 // MakeHost returns a Host!
 func MakeHost() Host {
 	i := Host{}
-	i.SetConfig(make(map[string]string))
+	i.SetOptions([]Option{})
 	return i
 }

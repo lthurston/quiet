@@ -8,6 +8,7 @@ import (
 	"regexp"
 
 	"github.com/lthurston/quiet/config"
+	"github.com/lthurston/quiet/host"
 	"github.com/lthurston/quiet/parser"
 	"github.com/lthurston/quiet/writer"
 
@@ -40,9 +41,9 @@ var newCmd = &cobra.Command{
 				if len(newName) == 0 {
 					newName = getNewHostname(newFrom, makeNewHostnameValidator(hosts))
 				}
-
-				host.SetConfig(getNewConfigValues(host.Config(), makeConfigValueValidator()))
+				host.SetOptions(getNewOptionValues(host.Options(), makeOptionValueValidator()))
 			}
+
 			host.SetName(newName)
 			newHostSnippet := host.String()
 			if newStdout {
@@ -67,7 +68,7 @@ func configRegexValidator(value string) bool {
 	return match
 }
 
-func makeConfigValueValidator() inputValidator {
+func makeOptionValueValidator() inputValidator {
 	return func(value string) error {
 		var err error
 
@@ -108,12 +109,17 @@ func getNewHostname(newFrom string, validator inputValidator) string {
 	return newName
 }
 
-func getNewConfigValues(config map[string]string, validator inputValidator) map[string]string {
-	newConfig := make(map[string]string)
-	for key, value := range config {
-		newConfig[key] = inputWithDefault(key+" [default is \""+value+"\"]: ", value)
+func getNewOptionValues(options []host.Option, validator inputValidator) []host.Option {
+	var newOption host.Option
+	newOptions := []host.Option{}
+	for _, option := range options {
+		newOption = host.MakeOption(
+			option.Keyword(),
+			inputWithDefault(option.Keyword()+" [default is \""+option.Argument()+"\"]: ", option.Argument()),
+		)
+		newOptions = append(newOptions, newOption)
 	}
-	return newConfig
+	return newOptions
 }
 
 func inputWithDefault(prompt, value string) string {
