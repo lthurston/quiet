@@ -24,38 +24,47 @@ var newCmd = &cobra.Command{
 	Use:   "new",
 	Short: "Appends new host using other host as template",
 	Long:  `New appends a new host to your SSH configuration based on other host`,
-	Run: func(cmd *cobra.Command, args []string) {
-		from := config.GetConfigNewFrom()
-		if len(newFrom) > 0 {
-			from = newFrom
+}
+
+func init() {
+	newCmd.Flags().StringVarP(&newFrom, "from", "f", "", "host to use as template")
+	newCmd.Flags().StringVarP(&newName, "name", "n", "", "new host name")
+	newCmd.Flags().BoolVarP(&newSkipInteractive, "skip-interactive", "s", false, "just copy; don't allow interactive")
+	newCmd.Flags().BoolVarP(&newStdout, "stdout", "o", false, "output to stdout rather than appending SSH config file")
+	newCmd.Run = new
+}
+
+func new(cmd *cobra.Command, args []string) {
+	from := config.GetConfigNewFrom()
+	if len(newFrom) > 0 {
+		from = newFrom
+	}
+
+	hosts := parser.HostsCollection{}
+	hosts.ReadFromFile(config.GetConfigFile())
+	if host, found := hosts.FindHostByName(from); found {
+		fmt.Println("Copying host \"" + from + "\"")
+		host.SetName(newName)
+		host.SetAliases([]string{})
+
+		if !newSkipInteractive {
+			if len(newName) == 0 {
+				newName = getNewHostname(newFrom, makeNewHostnameValidator(hosts))
+			}
+			host.SetOptions(getNewOptionValues(host.Options(), makeOptionValueValidator()))
 		}
 
-		hosts := parser.HostsCollection{}
-		hosts.ReadFromFile(config.GetConfigFile())
-		if host, found := hosts.FindHostByName(from); found {
-			fmt.Println("Copying host \"" + from + "\"")
-			host.SetName(newName)
-			host.SetAliases([]string{})
-
-			if !newSkipInteractive {
-				if len(newName) == 0 {
-					newName = getNewHostname(newFrom, makeNewHostnameValidator(hosts))
-				}
-				host.SetOptions(getNewOptionValues(host.Options(), makeOptionValueValidator()))
-			}
-
-			host.SetName(newName)
-			newHostSnippet := host.String()
-			if newStdout {
-				fmt.Println(newHostSnippet)
-			} else {
-				writer.Append(newHostSnippet)
-			}
-
+		host.SetName(newName)
+		newHostSnippet := host.String()
+		if newStdout {
+			fmt.Println(newHostSnippet)
 		} else {
-			fmt.Println("Couldn't find host or empty: \"" + from + "\"")
+			writer.Append(newHostSnippet)
 		}
-	},
+
+	} else {
+		fmt.Println("Couldn't find host or empty: \"" + from + "\"")
+	}
 }
 
 func hostnameRegexValidator(value string) bool {

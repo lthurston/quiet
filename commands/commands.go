@@ -28,11 +28,5 @@ func addCommands() {
 	QuietCmd.AddCommand(undoCmd)
 	QuietCmd.AddCommand(warpCmd)
 	QuietCmd.AddCommand(rmCmd)
-
-	// find a better spot to put the flags
-	newCmd.Flags().StringVarP(&newFrom, "from", "f", "", "host to use as template")
-	newCmd.Flags().StringVarP(&newName, "name", "n", "", "new host name")
-	newCmd.Flags().BoolVarP(&newSkipInteractive, "skip-interactive", "s", false, "just copy; don't allow interactive")
-	newCmd.Flags().BoolVarP(&newStdout, "stdout", "o", false, "output to stdout rather than appending SSH config file")
 	QuietCmd.AddCommand(newCmd)
 }
