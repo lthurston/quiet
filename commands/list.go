@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/lthurston/quiet/config"
-	"github.com/lthurston/quiet/parser"
+	"github.com/lthurston/quiet/host"
 	"github.com/spf13/cobra"
 )
 
@@ -15,7 +15,7 @@ var listCmd = &cobra.Command{
 	Short: "Lists all hosts",
 	Long:  `Shows you what hosts you have configured`,
 	Run: func(cmd *cobra.Command, args []string) {
-		hosts := parser.HostsCollection{}
+		hosts := host.HostsCollection{}
 		hosts.ReadFromFile(config.GetConfigFile())
 
 		widths := getColumnWidths(hosts)
@@ -31,7 +31,7 @@ var listCmd = &cobra.Command{
 	},
 }
 
-func getColumnWidths(hosts parser.HostsCollection) map[string]int {
+func getColumnWidths(hosts host.HostsCollection) map[string]int {
 	widths := make(map[string]int)
 	for _, host := range hosts.HostPositions {
 		if length := len([]rune(host.Name())); length > widths["Name"] {

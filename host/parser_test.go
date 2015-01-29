@@ -1,13 +1,13 @@
-package parser_test
+package host_test
 
 import (
 	"testing"
 
-	"github.com/lthurston/quiet/parser"
+	"github.com/lthurston/quiet/host"
 )
 
 func TestParse0(t *testing.T) {
-	hosts := parser.HostsCollection{}
+	hosts := host.HostsCollection{}
 	hosts.ReadFromString(
 		`
 Nothing in here!
@@ -25,7 +25,7 @@ Something garbagey
 }
 
 func TestParse1(t *testing.T) {
-	hosts := parser.HostsCollection{}
+	hosts := host.HostsCollection{}
 	hosts.ReadFromString(
 		`
 Host junkfood
@@ -52,7 +52,7 @@ Host junkfood
 }
 
 func TestParse2(t *testing.T) {
-	hosts := parser.HostsCollection{}
+	hosts := host.HostsCollection{}
 	hosts.ReadFromString(
 		`
 Host *
@@ -98,7 +98,7 @@ Host ormulex-qa
 }
 
 func TestFindHostByName(t *testing.T) {
-	hosts := parser.HostsCollection{}
+	hosts := host.HostsCollection{}
 	hosts.ReadFromString(
 		`
 Host *

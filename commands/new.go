@@ -9,7 +9,6 @@ import (
 
 	"github.com/lthurston/quiet/config"
 	"github.com/lthurston/quiet/host"
-	"github.com/lthurston/quiet/parser"
 	"github.com/lthurston/quiet/writer"
 
 	"github.com/spf13/cobra"
@@ -40,7 +39,7 @@ func new(cmd *cobra.Command, args []string) {
 		from = newFrom
 	}
 
-	hosts := parser.HostsCollection{}
+	hosts := host.HostsCollection{}
 	hosts.ReadFromFile(config.GetConfigFile())
 	if host, found := hosts.FindHostByName(from); found {
 		fmt.Println("Copying host \"" + from + "\"")
@@ -89,7 +88,7 @@ func makeOptionValueValidator() inputValidator {
 	}
 }
 
-func makeNewHostnameValidator(hosts parser.HostsCollection) inputValidator {
+func makeNewHostnameValidator(hosts host.HostsCollection) inputValidator {
 	return func(value string) error {
 		var err error
 		if !hostnameRegexValidator(value) {

@@ -3,9 +3,7 @@ package host_test
 import (
 	"reflect"
 	"testing"
-
 	h "github.com/lthurston/quiet/host"
-	"github.com/lthurston/quiet/parser"
 )
 
 func TestString(t *testing.T) {
@@ -23,7 +21,7 @@ func TestString(t *testing.T) {
 
 	rendered := host.String()
 
-	hosts := parser.HostsCollection{}
+	hosts := h.HostsCollection{}
 	hosts.ReadFromString(rendered)
 
 	if hosts.GetIndex(0).Name() != "skeins" {
