@@ -6,6 +6,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"fmt"
 
 	"github.com/lthurston/quiet/config"
 )
@@ -46,8 +47,21 @@ func getTempFilename(filename string) string {
 }
 
 // Replace replaces the file
-func Replace(content string) error {
+func Replace(contents string) error {
 	err := backup()
+	if err != nil {
+		panic(err)
+	}
+
+	err = os.Remove(config.GetConfigFile())
+	if err != nil {
+		panic(err)
+	}
+
+	f, err := os.Create(config.GetConfigFile())
+	defer f.Close()
+	f.WriteString(contents)
+
 	return err
 }
 

@@ -82,3 +82,22 @@ In`
 		t.Error("Unexpected splice results")
 	}
 }
+
+func TestEmptySplice(t *testing.T) {
+	reader := strings.NewReader(contents)
+	var buffer bytes.Buffer
+	splicer.SpliceInto(3,5,"", reader, &buffer)
+	splice := buffer.String()
+
+	expectedResult := `0
+1
+2
+6
+7
+8
+9`
+
+	if expectedResult != splice {
+		t.Error("Unexpected splice results")
+	}
+}
