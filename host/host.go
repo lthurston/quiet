@@ -96,8 +96,7 @@ func (host Host) String() string {
 	tmpl, err := template.New("snip").Parse(`
 Host {{.Name}}{{if .Aliases}}{{range .Aliases}} {{.}}{{end}}{{end}}
 {{range .Options }}	{{.}}
-{{end}}
-    `)
+{{end}}`)
 	if err != nil {
 		panic(err)
 	}
