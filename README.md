@@ -10,22 +10,25 @@ editing, copying, exporting (to share with others).
 Help output says most of it:
 
 ```
+
 Usage:
-quiet [flags]
-quiet [command]
+  quiet [flags]
+  quiet [command]
 
 Available Commands:
-version                   Print the version number of Quiet
-config                    Lists / modifies configuration
-dump                      Dumps everything Quiet knows
-list                      Lists all hosts
-export                    Exports config snippet and keys for sharing
-undo                      Undo the last quiet action
-new                       Appends new host using other host as template
-help [command]            Help about any command
+  version                   Print the version number of Quiet
+  config                    Lists / modifies configuration
+  dump                      Dumps everything Quiet knows
+  list                      Lists all hosts
+  export                    Exports config snippet and keys for sharing
+  undo                      Undo the last quiet action
+  warp                      Generates warp config
+  rm                        Deletes a host
+  new                       Appends new host using other host as template
+  help [command]            Help about any command
 
-Available Flags:
---help=false: help for quiet
+ Available Flags:
+      --help=false: help for quiet
 
 Use "quiet help [command]" for more information about that command.
 ```
@@ -146,3 +149,20 @@ export PATH=$PATH:$GOBIN
 5) Fetch the source: `go get github.com/lthurston/quiet`
 
 6) Compile and install: `go install src/github.com/lthurston/quiet/quiet.go`
+
+### Release Notes
+
+0.3 alpha
+
+* Updated this readme
+* rm command implemented
+* dump command implemented
+* refactoring of the parser / hosts collection
+
+0.2 alpha
+
+* refactored hosts / host positions
+
+0.1 alpha
+
+* made it work

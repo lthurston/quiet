@@ -9,8 +9,8 @@ import (
 
 var dumpCmd = &cobra.Command{
 	Use:   "dump",
-	Short: "Dumps everything quiet knows",
-	Long:  `Outputs all hosts quiet knows about`,
+	Short: "Dumps everything Quiet knows",
+	Long:  `Outputs all hosts Quiet knows about`,
 	Run: func(cmd *cobra.Command, args []string) {
 		hosts := host.HostsCollection{}
 		hosts.ReadFromFile(config.GetConfigFile())
