@@ -3,6 +3,25 @@
 Quiet simplifies repetitive SSH config management tasks. Allows listing,
 editing, copying, exporting (to share with others).
 
+## Installation
+
+1) Install Go (brew install go, or whatever)
+
+2) Set up a go dev environment: `mkdir -p ~/go/{src,bin}`
+
+3) Add some stuff to your .bash_profile:
+```
+export GOPATH=$HOME/go
+export GOBIN=$GOPATH/bin
+export PATH=$PATH:$GOBIN
+```
+
+4) Get thee to the Go-ery: `cd ~/go`
+
+5) Fetch the source: `go get github.com/lthurston/quiet`
+
+6) Compile and install: `go install src/github.com/lthurston/quiet/quiet.go`
+
 ## Usage
 
 ### General Usage
@@ -117,6 +136,56 @@ command line, perhaps by repurposing the -n/--name as to the hostname value.
 Also, you can use the -o flag as a kind of dry run to see what quiet will append
 to your hosts file before you have it actually modify the file.
 
+### List Command
+
+List will output hosts one per line, with the config options configurable in your
+.quiet file. This makes scanning your config file much quicker. Just run
+
+```
+quiet list
+```
+
+Want them sorted alphabetically by name? Then pipe through `sort`!
+
+```
+quiet list | sort
+```
+
+### Export Command
+
+Export will locate the specified host by name, then output the configuration and
+any keys associated with that configuration. By default it only looks at the
+IdentityFile option for a private key, but you can configure it to look at other
+options as well. It will also look for and display the public key as well, but
+only if the public key filename and path is the same as the private key filename
+and path with ".pub" appended. This works for me, but could be easily made more
+flexible.
+
+Look, just look at this if you don't believe me:
+
+```
+$ quiet export something
+
+Host something
+	Hostname something.blahblah.com
+	User ubuntu
+	IdentityFile ~/.ssh/id_something
+
+~/.ssh/id_something
+-----BEGIN RSA PRIVATE KEY-----
+
+... a private key ...
+
+-----END RSA PRIVATE KEY-----
+
+~/.ssh/id_something.pub
+ssh-rsa BLAHBLAHBLAHBLAHBLAH ... a public key ... BLAHBLAHBLAH
+```
+
+Isn't that nice?
+
+
+
 ### Backups
 
 When quiet updates your config file it backs up the most recent version of the
@@ -131,24 +200,12 @@ I'm not gonna promise Quiet won't mangle your config file in some sort of perman
 way, especially while it's still alpha, so maybe you should just back up your own
 stuff in your own way before you start using it. I'm only a human being.
 
-## Installation
+## Roadmap
 
-1) Install Go (brew install go, or whatever)
+### Modify Command
 
-2) Set up a go dev environment: `mkdir -p ~/go/{src,bin}`
-
-3) Add some stuff to your .bash_profile:
-```
-export GOPATH=$HOME/go
-export GOBIN=$GOPATH/bin
-export PATH=$PATH:$GOBIN
-```
-
-4) Get thee to the Go-ery: `cd ~/go`
-
-5) Fetch the source: `go get github.com/lthurston/quiet`
-
-6) Compile and install: `go install src/github.com/lthurston/quiet/quiet.go`
+This isn't implemented yet. I'm thinking one could modify / add / remove individual options, add / remove
+aliases, rename hosts.
 
 ### Release Notes
 
