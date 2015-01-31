@@ -117,8 +117,6 @@ command line, perhaps by repurposing the -n/--name as to the hostname value.
 Also, you can use the -o flag as a kind of dry run to see what quiet will append
 to your hosts file before you have it actually modify the file.
 
-
-
 ### Backups
 
 When quiet updates your config file it backs up the most recent version of the
@@ -126,10 +124,12 @@ file, and keeps the last 5 versions. The backup file has the same name as the
 SSH configuration file with `.quiet.bak.#` appended to the filename, where the
 octothrombulus is replaced by a numbrosimbel (1 - 5).
 
-You can revert to the last backup with `quiet undo`. This is probably less
-useful now with quiet only appending the SSH config file. In the future, it will
-be able to modify existing configuration snippets, which means splicing and
-dicing and potentially presenting all sorts of opportunities for chaos.
+You can revert to the last backup with `quiet undo`. This just swaps the most
+recent backup with the current file.
+
+I'm not gonna promise Quiet won't mangle your config file in some sort of permanent
+way, especially while it's still alpha, so maybe you should just back up your own
+stuff in your own way before you start using it. I'm only a human being.
 
 ## Installation
 
