@@ -6,7 +6,6 @@ import (
 	"os"
 	"strconv"
 	"strings"
-	"fmt"
 
 	"github.com/lthurston/quiet/config"
 )

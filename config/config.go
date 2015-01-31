@@ -4,15 +4,16 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"os/user"
+	"github.com/lthurston/quiet/util"
 
 	goTomlConfig "github.com/stvp/go-toml-config"
 )
 
 var (
-	configFile       = goTomlConfig.String("file", getHomeDir()+"/.ssh/config")
+	configFile       = goTomlConfig.String("file", util.GetHomeDir()+"/.ssh/config")
 	configListFields = goTomlConfig.String("list.fields", "User, Hostname")
 	configNewFrom    = goTomlConfig.String("new.from", "")
+	configExportFilenameOptions = goTomlConfig.String("export.filenameOptions", "IdentityFile")
 )
 
 // quietConfig stores the location of the quiet config, defaults to "~/.quiet"
@@ -38,11 +39,9 @@ func GetConfigNewFrom() string {
 	return *configNewFrom
 }
 
-// GetConfigMap returns a map of all configuration values
-func GetConfigMap() map[string]string {
-	configMap := make(map[string]string)
-	configMap["file"] = *configFile
-	return configMap
+// GetConfigExportFileOptions
+func GetConfigExportFilenameOptions() string {
+	return *configExportFilenameOptions
 }
 
 // SetQuietConfig sets the location of the quiet config file
@@ -59,7 +58,7 @@ func init() {
 // for .quiet can be passed in, but this is likely not all that useful
 func parse() {
 	if quietConfig == "" {
-		quietConfig = getHomeDir() + "/.quiet"
+		quietConfig = util.GetHomeDir() + "/.quiet"
 	}
 
 	if _, err := os.Stat(quietConfig); err != nil {
@@ -74,16 +73,6 @@ func parse() {
 		fmt.Println("Your .quiet configuration exists, but it's not parsable. :(")
 		os.Exit(1)
 	}
-}
-
-// getHomeDir returns the user's home directory -- this belongs elsewhere
-func getHomeDir() string {
-	usr, err := user.Current()
-	if err != nil {
-		panic(err)
-	}
-
-	return usr.HomeDir
 }
 
 // create will write a configuration file
@@ -106,7 +95,10 @@ func getQuietConfigBytes() (bytes []byte) {
 fields = "` + *configListFields + `"
 
 [new]
-from = "` + *configNewFrom + `"`,
+from = "` + *configNewFrom + `"
+
+[export]
+filenameOptions = "`+  *configExportFilenameOptions + `"`,
 	)
 	return
 }
