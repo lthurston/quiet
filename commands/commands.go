@@ -29,4 +29,5 @@ func addCommands() {
 	QuietCmd.AddCommand(warpCmd)
 	QuietCmd.AddCommand(rmCmd)
 	QuietCmd.AddCommand(newCmd)
+	QuietCmd.AddCommand(findCmd)
 }

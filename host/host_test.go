@@ -37,3 +37,24 @@ func TestString(t *testing.T) {
 	// 	t.Errorf("Wrong config, expecting: %s got: %s", config, hosts.GetIndex(0).Config())
 	// }
 }
+
+func TestContainsStrings(t *testing.T) {
+	name := "skeins"
+	aliases := []string{"sizzle", "toast", "blort"}
+	options := []string{"User gushaguy", "HostName skeins.com"}
+	host := h.MakeHost()
+	host.SetName(name)
+	host.SetAliases(aliases)
+
+	for _, line := range options {
+		host.AddOptionFromString(line)
+	}
+
+	if(!host.ContainsStrings([]string{"sizzle", "ast", "guy", ".com"})) {
+		t.Errorf("Contains strings isn't returning true when it should")
+	}
+
+	if(host.ContainsStrings([]string{"poo"})) {
+		t.Errorf("Contains strings isn't returning false when it should")
+	}
+}

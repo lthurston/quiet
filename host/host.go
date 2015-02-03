@@ -109,6 +109,18 @@ Host {{.Name}}{{if .Aliases}}{{range .Aliases}} {{.}}{{end}}{{end}}
 	return buf.String()
 }
 
+// ContainsStrings returns true if the host contains the findStrings
+func (host Host) ContainsStrings(findStrings []string) bool {
+	for _, findString := range findStrings {
+		upFindString := strings.ToUpper(findString)
+		upHost := strings.ToUpper(host.String())
+		if(!strings.Contains(upHost, upFindString)) {
+			return false
+		}
+	}
+	return true
+}
+
 // MakeHost returns a Host!
 func MakeHost() Host {
 	i := Host{}
