@@ -24,7 +24,7 @@ var findCmd = &cobra.Command{
 				for _, arg := range args {
 					escArg := regexp.QuoteMeta(arg)
 					re := regexp.MustCompile("(?i)(" + escArg +")")
-					hostString = re.ReplaceAllString(hostString,"\x1b[7m $1 \x1b[0m")
+					hostString = re.ReplaceAllString(hostString,"\x1b[7m$1\x1b[0m")
 				}
 				fmt.Println(hostString)
 			}
