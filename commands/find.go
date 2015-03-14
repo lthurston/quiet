@@ -13,6 +13,7 @@ var findCmd = &cobra.Command{
 	Use:   "find",
 	Short: "Finds hosts based on search arguments",
 	Long:  `Finds hosts based on search arguments`,
+	Aliases: []string{"grep"},
 	Run: func(cmd *cobra.Command, args []string) {
 		hosts := host.HostsCollection{}
 		hosts.ReadFromFile(config.GetConfigFile())
