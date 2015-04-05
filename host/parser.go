@@ -9,7 +9,7 @@ import (
 var ignoreLineRegexes = []string{
 	`^\s*$`,
 	`^\s*#`,
-	`^\s*Host \*`,
+	`^\s*Host \*\s*$`,
 }
 
 // fromScanner populates the host from a bufio.Scanner
