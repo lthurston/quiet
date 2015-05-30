@@ -12,8 +12,6 @@ import (
 	"log"
 	"archive/tar"
 	"bytes"
-	//"time"
-	//"crypto/md5"
 )
 
 var exportTar, exportIgnoreProblems bool
@@ -29,7 +27,7 @@ type exportArchive struct {
 }
 
 var exportCmd = &cobra.Command{
-	Use:   "export",
+	Use:   "export [hostname]",
 	Short: "Exports config snippet and keys for sharing",
 	Long:  `Exports one or more host snippets and associated keys for easy distribution`,
 }
@@ -44,16 +42,20 @@ func exportCmdRun(cmd *cobra.Command, args []string) {
 	hosts := host.HostsCollection{}
 	hosts.ReadFromFile(config.GetConfigFile())
 
-	if host, found := hosts.FindHostByName(args[0]); found {
-		archive := makeExportArchive(host)
+	if len(args) > 0 {
+		if host, found := hosts.FindHostByName(args[0]); found {
+			archive := makeExportArchive(host)
 
-		if(exportTar) {
-			fmt.Println(tarOutput(archive))
+			if (exportTar) {
+				fmt.Println(tarOutput(archive))
+			} else {
+				hrOutput(archive)
+			}
 		} else {
-			hrOutput(archive)
+			log.Fatal("Couldn't find host or empty: \"" + args[0] + "\"")
 		}
 	} else {
-		log.Fatal("Couldn't find host or empty: \"" + args[0] + "\"")
+		log.Fatal("Hostname to export must be specified")
 	}
 }
 
