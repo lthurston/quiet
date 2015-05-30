@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"strings"
 	"text/template"
+	"regexp"
 )
 
 // Option contains a keyword and an argument
@@ -112,9 +113,9 @@ Host {{.Name}}{{if .Aliases}}{{range .Aliases}} {{.}}{{end}}{{end}}
 // ContainsStrings returns true if the host contains the findStrings
 func (host Host) ContainsStrings(findStrings []string) bool {
 	for _, findString := range findStrings {
-		upFindString := strings.ToUpper(findString)
-		upHost := strings.ToUpper(host.String())
-		if(!strings.Contains(upHost, upFindString)) {
+		escArg := regexp.QuoteMeta(findString)
+		re := regexp.MustCompile("(?i)(" + escArg +")")
+		if(!re.Match([]byte(host.String()))) {
 			return false
 		}
 	}
