@@ -25,7 +25,6 @@ func fromScanner(hosts *HostsCollection, s *bufio.Scanner) {
 
 	host := MakeHostPosition()
 	for s.Scan() {
-		lineIndex++
 		line := s.Text()
 		if !skippableLine(line) {
 			if hostLine(line) {
@@ -46,6 +45,7 @@ func fromScanner(hosts *HostsCollection, s *bufio.Scanner) {
 			}
 			lastNonSkippableLine = lineIndex
 		}
+		lineIndex++
 	}
 
 	if foundFirstHostLine {

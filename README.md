@@ -10,9 +10,13 @@ editing, copying, exporting (to share with others).
 2) Set up a go dev environment: `mkdir -p ~/go/{src,bin}`
 
 3) Add some stuff to your .bash_profile:
+
+Your GOROOT is probably not in the same place as mine.
+
 ```
 export GOPATH=$HOME/go
 export GOBIN=$GOPATH/bin
+export GOROOT=/opt/boxen/homebrew/Cellar/go/1.5.1/libexec
 export PATH=$PATH:$GOBIN
 ```
 
@@ -75,16 +79,16 @@ Available Flags:
 Use "quiet help [command]" for more information about that command.
 ```
 
-The -f/--from setting can also come from .quiet configuration as new.from. The
+The -f / --from setting can also come from .quiet configuration as new.from. The
 value should be an existing hostname or a template that you've created for
 purpose of providing common defaults.
 
--s/--skip-interactive will skip the interactive modification of values from the
+-s / --skip-interactive will skip the interactive modification of values from the
 copied configuration snippet, making new behave more like a copy action.
 
--n/--name allows the name of the new host to be specified in the command.
+-n / --name allows the name of the new host to be specified in the command.
 
--o/--stdout will output the new snippet rather than writing to the ssh config
+-o / --stdout will output the new snippet rather than writing to the ssh config
 file.
 
 **Examples**

@@ -43,11 +43,11 @@ Host junkfood
 	if count := hosts.Count(); count != 1 {
 		t.Errorf("Expecting 1 hosts in this config; got %v", count)
 	}
-	if hosts.GetIndex(0).StartLine() != 2 {
-		t.Errorf("Expecting first host to begin on line 2; got %v", hosts.GetIndex(0).StartLine())
+	if hosts.GetIndex(0).StartLine() != 1 {
+		t.Errorf("Expecting first host to begin on line 1; got %v", hosts.GetIndex(0).StartLine())
 	}
-	if hosts.GetIndex(0).EndLine() != 8 {
-		t.Errorf("Expecting first host to end on line 8; got %v", hosts.GetIndex(0).EndLine())
+	if hosts.GetIndex(0).EndLine() != 7 {
+		t.Errorf("Expecting first host to end on line 7; got %v", hosts.GetIndex(0).EndLine())
 	}
 }
 
@@ -76,24 +76,42 @@ Host ormulex-qa
 			User monkey
 			ProxyCommand ssh cmw3wbq10 'nc %h %banana %p'
 
+#2A
+#1A
+#0A
+Host fraceass
+        Hostname fesces.org
+        User blah blah woof woof
+        Identidfysdfjkh dsf
+        IdentityFile test
+        IdentityFile blah blah
+#0B
+#1B
+#2B
 
 # A comment with some empty lines around it
 
 `)
-	if count := hosts.Count(); count != 2 {
-		t.Errorf("Expecting 2 hosts in this config; got %v", count)
+	if count := hosts.Count(); count != 3 {
+		t.Errorf("Expecting 3 hosts in this config; got %v", count)
 	}
-	if hosts.GetIndex(0).StartLine() != 13 {
-		t.Errorf("Expecting first host to begin on line 13; got %v", hosts.GetIndex(0).StartLine())
+	if hosts.GetIndex(0).StartLine() != 12 {
+		t.Errorf("Expecting first host to begin on line 12; got %v", hosts.GetIndex(0).StartLine())
 	}
-	if hosts.GetIndex(0).EndLine() != 16 {
-		t.Errorf("Expecting first host to end on line 16; got %v", hosts.GetIndex(0).EndLine())
+	if hosts.GetIndex(0).EndLine() != 15 {
+		t.Errorf("Expecting first host to end on line 15; got %v", hosts.GetIndex(0).EndLine())
 	}
-	if hosts.GetIndex(1).StartLine() != 18 {
-		t.Errorf("Expecting second host to begin on line 18; got %v", hosts.GetIndex(1).StartLine())
+	if hosts.GetIndex(1).StartLine() != 17 {
+		t.Errorf("Expecting second host to begin on line 17; got %v", hosts.GetIndex(1).StartLine())
 	}
-	if hosts.GetIndex(1).EndLine() != 21 {
-		t.Errorf("Expecting second host to end on line 21; got %v", hosts.GetIndex(1).EndLine())
+	if hosts.GetIndex(1).EndLine() != 20 {
+		t.Errorf("Expecting second host to end on line 20; got %v", hosts.GetIndex(1).EndLine())
+	}
+	if hosts.GetIndex(2).StartLine() != 25 {
+		t.Errorf("Expecting second host to begin on line 25; got %v", hosts.GetIndex(1).StartLine())
+	}
+	if hosts.GetIndex(2).EndLine() != 30 {
+		t.Errorf("Expecting second host to end on line 30; got %v", hosts.GetIndex(1).EndLine())
 	}
 }
 

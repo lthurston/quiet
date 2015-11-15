@@ -29,10 +29,7 @@ var rmCmd = &cobra.Command{
 
 			defer f.Close()
 
-			// TODO: Splicer line numbering is weird. Ideally, we'd put the
-			// StartLine() as the splice from and EndLine() as splice too, any everything
-			// would taste like candy canes.
-			splicer.SpliceInto(host.StartLine() - 1, host.EndLine(), "", f, &buffer)
+			splicer.SpliceInto(host.StartLine(), host.EndLine(), "", f, &buffer)
 			writer.Replace(buffer.String())
 		} else {
 			fmt.Println("Couldn't find host or empty: \"" + args[0] + "\"")
