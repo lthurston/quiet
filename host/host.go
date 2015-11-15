@@ -39,7 +39,7 @@ type Host struct {
 	options []Option
 }
 
-// GetOptionArgument gets a argument for an option keyword for a host
+// GetOptionArgument gets an argument for an option keyword for a host
 func (host Host) GetOptionArgument(keyword string) string {
 	for _, option := range host.options {
 		if option.keyword == keyword {
@@ -53,8 +53,15 @@ func (host Host) GetOptionArgument(keyword string) string {
 func (host *Host) AddOptionFromString(line string) {
 	line = strings.TrimSpace(line)
 	sepIndex := strings.IndexAny(line, " \t")
-	keyword, argument := line[0:sepIndex], line[sepIndex+1:]
-	host.options = append(host.options, Option{keyword: keyword, argument: argument})
+
+	var keyword, argument string
+	if sepIndex != -1 {
+		keyword, argument = line[0:sepIndex], line[sepIndex+1:]
+	} else {
+		keyword, argument = line, ""
+	}
+
+	host.options = append(host.options, Option{keyword: strings.TrimSpace(keyword), argument: strings.TrimSpace(argument)})
 }
 
 // SetName sets name

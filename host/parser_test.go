@@ -159,29 +159,6 @@ Host ormulex-qa
 	if found && host.Name() != "ormulex-qa" {
 		t.Errorf("hosts.FindHostByName found the wrong host (#4)")
 	}
-
-}
-
-func TestParseInvalidHostOptions(t *testing.T) {
-	hosts := host.HostsCollection{}
-	hosts.ReadFromString(
-`
-
-# Host options should have a value
-Host ormulex-dev
-				Hostname dev.ormulex.com
-				User mule
-				IdentityFile
-
-Host ormulex-qa
-				Hostname cmw3wbq10
-				User
-				ProxyCommand ssh cmw3wbq10 'nc %h %banana %p'
-
-
-# A comment with some empty lines around it
-
-`)
 }
 
 func TestFindHostValue(t *testing.T) {

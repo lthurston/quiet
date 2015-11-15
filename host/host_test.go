@@ -58,3 +58,29 @@ func TestContainsStrings(t *testing.T) {
 		t.Errorf("Contains strings isn't returning false when it should")
 	}
 }
+
+func TestAddOptionFromString(t *testing.T) {
+	host := h.MakeHost()
+
+	host.AddOptionFromString("junktown ~/.sdklfj/hosrsefj")
+	host.AddOptionFromString("Mule")
+	host.AddOptionFromString(" 	sdlkfj 	 	 	 ")
+	host.AddOptionFromString(" 	sddfsdflkfj 	 sdfsdf	 	sdfsdfsdf ")
+
+
+	if arg := host.GetOptionArgument("junktown"); arg != "~/.sdklfj/hosrsefj" {
+		t.Errorf("Unexpected option argument. Expected \"~/.sdklfj/hosrsefj\" got %s.", arg)
+	}
+
+	if arg := host.GetOptionArgument("Mule"); arg != "" {
+		t.Errorf("Unexpected option argument. Expected empty string got %s.", arg)
+	}
+
+	if arg := host.GetOptionArgument("sdlkfj"); arg != "" {
+		t.Errorf("Unexpected option argument. Expected empty string got \"%s\".", arg)
+	}
+
+	if arg := host.GetOptionArgument("sddfsdflkfj"); arg != "sdfsdf	 	sdfsdfsdf" {
+		t.Errorf("Unexpected option argument. Expected \"sdfsdf	 	sdfsdfsdf\" got \"%s\".", arg)
+	}
+}
