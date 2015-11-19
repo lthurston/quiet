@@ -12,6 +12,14 @@ import (
 	"log"
 	"archive/tar"
 	"bytes"
+	"encoding/base64"
+	"crypto/aes"
+	"io"
+	"crypto/rand"
+	"crypto/cipher"
+	"errors"
+	"compress/gzip"
+	"math"
 )
 
 var exportTar, exportIgnoreProblems bool
@@ -47,7 +55,29 @@ func exportCmdRun(cmd *cobra.Command, args []string) {
 			archive := makeExportArchive(host)
 
 			if (exportTar) {
-				fmt.Println(tarOutput(archive))
+				key := []byte("something something something  1")
+				tarOut := tarOutput(archive)
+				zippedTarOut := zip(tarOut)
+				encrypted, _ := encrypt(key, zippedTarOut)
+				base64d := base64.StdEncoding.EncodeToString(encrypted)
+
+				out := ""
+				for i := 1.00 ; i <= math.Ceil(float64(len(base64d)) / 80.0); i++ {
+					if (i * 80) <= float64(len(base64d)) {
+						out = out + base64d[int((i - 1) * 80):int(i * 80)]
+					} else {
+						out = out + base64d[int((i - 1) * 80):]
+					}
+				}
+
+				backBase64d := strings.Join(out, "\n")
+				backEncryped := base64.StdEncoding.DecodeString(backBase64d)
+				backZippedTarOut, _ := decrypt(key, backEncrypted)
+				backTarOut :=
+
+
+				//decrypted, _ := decrypt(aKey, ecrypted)
+				//fmt.Println(string(decrypted))
 			} else {
 				hrOutput(archive)
 			}
@@ -90,47 +120,5 @@ func ignorableFatal(err error) {
 	}
 }
 
-func hrOutput(archive exportArchive) {
-	fmt.Println(archive.config)
 
-	for _, file := range archive.files {
-		fmt.Println(file.filename, "\n")
-		fmt.Println(string(file.contents))
-	}
-}
 
-func tarOutput(archive exportArchive) string {
-	buf := &bytes.Buffer{}
-	tw := tar.NewWriter(buf)
-
-	// Note that because we don't actually expect this tarball to be extracted, we're not dealing with
-	// setting modes or file times
-	header := &tar.Header {
-		Name: "quiet.ssh-config-snippet",
-		Size: int64(len(archive.config)),
-	}
-	if err := tw.WriteHeader(header); err != nil {
-		log.Fatal(err)
-	}
-	if _, err := tw.Write([]byte(archive.config)); err != nil {
-		log.Fatal(err)
-	}
-
-	for _, file := range archive.files {
-		header = &tar.Header {
-			Name: file.filename,
-			Size: int64(len(file.contents)),
-		}
-		if err := tw.WriteHeader(header); err != nil {
-			log.Fatal(err)
-		}
-		if _, err := tw.Write(file.contents); err != nil {
-			log.Fatal(err)
-		}
-	}
-
-	if err := tw.Close(); err != nil {
-		log.Fatal(err)
-	}
-	return buf.String()
-}

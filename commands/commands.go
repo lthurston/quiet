@@ -25,6 +25,7 @@ func addCommands() {
 	QuietCmd.AddCommand(dumpCmd)
 	QuietCmd.AddCommand(listCmd)
 	QuietCmd.AddCommand(exportCmd)
+	QuietCmd.AddCommand(importCmd)
 	QuietCmd.AddCommand(undoCmd)
 	QuietCmd.AddCommand(warpCmd)
 	QuietCmd.AddCommand(rmCmd)
