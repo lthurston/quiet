@@ -6,6 +6,11 @@ import (
 	h "github.com/lthurston/quiet/host"
 )
 
+const testTemplate = `
+Host {{.Name}}{{if .Aliases}}{{range .Aliases}} {{.}}{{end}}{{end}}
+{{range .Options }}	{{.}}
+{{end}}`
+
 func TestString(t *testing.T) {
 	name := "skeins"
 	aliases := []string{"sizzle", "toast", "blort"}
@@ -19,7 +24,7 @@ func TestString(t *testing.T) {
 		host.AddOptionFromString(line)
 	}
 
-	rendered := host.String()
+	rendered := host.RenderHostTemplate(testTemplate)
 
 	hosts := h.HostsCollection{}
 	hosts.ReadFromString(rendered)

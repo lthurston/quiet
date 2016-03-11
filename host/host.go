@@ -5,7 +5,13 @@ import (
 	"strings"
 	"text/template"
 	"regexp"
+	"github.com/lthurston/quiet/config"
 )
+
+const defaultHostTemplate = `
+Host {{.Name}}{{if .Aliases}}{{range .Aliases}} {{.}}{{end}}{{end}}
+{{range .Options }}	{{.}}
+{{end}}`
 
 // Option contains a keyword and an argument
 type Option struct {
@@ -99,12 +105,14 @@ func (host Host) Options() []Option {
 	return host.options
 }
 
-// RenderSnippet renders a host snippet
+// String renders a host snippet
 func (host Host) String() string {
-	tmpl, err := template.New("snip").Parse(`
-Host {{.Name}}{{if .Aliases}}{{range .Aliases}} {{.}}{{end}}{{end}}
-{{range .Options }}	{{.}}
-{{end}}`)
+	return host.RenderHostTemplate(configTemplate())
+}
+
+// RenderHostTemplate renders the host, given a template string
+func (host Host) RenderHostTemplate(templateString string) string {
+	tmpl, err := template.New("snip").Parse(templateString)
 	if err != nil {
 		panic(err)
 	}
@@ -117,12 +125,17 @@ Host {{.Name}}{{if .Aliases}}{{range .Aliases}} {{.}}{{end}}{{end}}
 	return buf.String()
 }
 
+
+func configTemplate() string {
+	return config.GetConfigTemplate()
+}
+
 // ContainsStrings returns true if the host contains the findStrings
 func (host Host) ContainsStrings(findStrings []string) bool {
 	for _, findString := range findStrings {
 		escArg := regexp.QuoteMeta(findString)
 		re := regexp.MustCompile("(?i)(" + escArg +")")
-		if(!re.Match([]byte(host.String()))) {
+		if(!re.Match([]byte(host.RenderHostTemplate(defaultHostTemplate)))) {
 			return false
 		}
 	}

@@ -10,10 +10,14 @@ import (
 )
 
 var (
-	configFile       = goTomlConfig.String("file", util.GetHomeDir()+"/.ssh/config")
-	configListFields = goTomlConfig.String("list.fields", "User, Hostname")
-	configNewFrom    = goTomlConfig.String("new.from", "")
+	configFile                  = goTomlConfig.String("file", util.GetHomeDir()+"/.ssh/config")
+	configListFields            = goTomlConfig.String("list.fields", "User, Hostname")
+	configNewFrom               = goTomlConfig.String("new.from", "")
 	configExportFilenameOptions = goTomlConfig.String("export.filenameOptions", "IdentityFile")
+	configHostTemplate          = goTomlConfig.String("template", `
+Host {{.Name}}{{if .Aliases}}{{range .Aliases}} {{.}}{{end}}{{end}}
+{{range .Options }}	{{.}}
+{{end}}`)
 )
 
 // quietConfig stores the location of the quiet config, defaults to "~/.quiet"
@@ -42,6 +46,11 @@ func GetConfigNewFrom() string {
 // GetConfigExportFileOptions
 func GetConfigExportFilenameOptions() string {
 	return *configExportFilenameOptions
+}
+
+// GetConfigTemplate returns the template
+func GetConfigTemplate() string {
+	return *configHostTemplate
 }
 
 // SetQuietConfig sets the location of the quiet config file
