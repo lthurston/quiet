@@ -30,4 +30,5 @@ func addCommands() {
 	QuietCmd.AddCommand(rmCmd)
 	QuietCmd.AddCommand(newCmd)
 	QuietCmd.AddCommand(findCmd)
+	QuietCmd.AddCommand(tinyCmd)
 }
